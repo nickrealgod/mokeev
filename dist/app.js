@@ -183,11 +183,11 @@ function draw(now) {
   const renderRatio=desiredZoom*euro.w*(canvas.width/w)/sourceWidth;
   const density=[.5,1].reduce((a,b)=>Math.abs(b-renderRatio)<Math.abs(a-renderRatio)?b:a);
   const initialZoom=Math.abs(density/renderRatio-1)<=.2?desiredZoom*density/renderRatio:desiredZoom;
-  const zoom=initialZoom*(1-ease)+fit*ease, angle=(1-ease)*Math.PI/2;
+  const zoom=2*initialZoom*(1-ease)+fit*ease, angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
   const background=ctx.createLinearGradient(0,0,0,h);
-  const blend=rgb=>'rgb('+rgb.map(c=>Math.round(37+(c-37)*ease)).join(',')+')';
+  const blend=rgb=>'rgb('+rgb.join(',')+')';
   backgrounds[backgroundIndex].forEach(([position,color])=>background.addColorStop(position,blend(color)));
   ctx.fillStyle=background;ctx.fillRect(0,0,w,h);
   nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
@@ -204,10 +204,10 @@ function draw(now) {
     paintLetter(ctx,item,now);
     if(focused===item){ctx.strokeStyle='#999';ctx.lineWidth=1/fit;ctx.strokeRect(v.x,v.y,v.w,v.h);}
   }
-  if(iconEase>0) {
+  {
     // Mirror the live artwork, including the current gradient surfaces and drift.
     const height=(bounds.bottom-bounds.y)*fit;
-    const reflectionTop=h-height+(1-iconEase)*(linksTop+120);
+    const reflectionTop=h-height;
     const dpr=canvas.width/w;
     const rw=canvas.width,rh=Math.ceil((height+6)*dpr);
     if(reflection.width!==rw||reflection.height!==rh){reflection.width=rw;reflection.height=rh;}
@@ -219,8 +219,8 @@ function draw(now) {
     const fade=rc.createLinearGradient(0,3,0,height+3);
     fade.addColorStop(0,'rgba(0,0,0,0.09)');fade.addColorStop(1,'rgba(0,0,0,0)');
     rc.globalCompositeOperation='destination-in';rc.fillStyle=fade;rc.fillRect(0,0,w,height+6);rc.globalCompositeOperation='source-over';
-    ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
-    ctx.globalAlpha=iconEase;ctx.drawImage(reflection,0,reflectionTop-3,w,height+6);ctx.globalAlpha=1;
+    // Reflection is part of the same world: camera rotation and zoom apply to both.
+    ctx.drawImage(reflection,center[0]-w/(2*fit),center[1]+(reflectionTop-3-letteringY)/fit,w/fit,(height+6)/fit);
   }
   raf=requestAnimationFrame(draw);
 }

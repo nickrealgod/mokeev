@@ -48,3 +48,8 @@ nav a:hover .active,nav a:focus-visible .active,nav a:active .active{opacity:1}
 
 /* Stable gray base; only the official-color overlay fades. */
 .icon .inactive{opacity:1;transition:none;z-index:0}.icon .active{z-index:1;pointer-events:none}.icon{pointer-events:none}
+
+/* A single original image: saturation and scale animate without layer swapping. */
+html,body{background:linear-gradient(#f7fafe,#fff8ed)}
+nav .icon img.logo{opacity:1;filter:grayscale(1);transform:scale(1);transition:filter .15s ease-out,transform .15s ease-out}
+nav a:hover .icon img.logo,nav a:focus-visible .icon img.logo,nav a:active .icon img.logo{filter:grayscale(0);transform:scale(1.1)}
