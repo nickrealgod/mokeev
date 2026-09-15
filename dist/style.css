@@ -1,0 +1,50 @@
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#252525;color:#252525;font-family:Arial,sans-serif}main{position:fixed;inset:0}canvas{display:block;width:100%;height:100%;touch-action:none}nav{position:absolute;left:50%;top:var(--links-top,75%);transform:translate(-50%,-50%);display:flex;gap:clamp(34px,5vw,80px);opacity:0;visibility:hidden;pointer-events:none}body.ready nav{pointer-events:auto}nav a{width:80px;min-height:108px;text-decoration:none;color:inherit;display:flex;align-items:center;flex-direction:column;position:relative}nav img{width:64px;height:64px;object-fit:contain;filter:grayscale(1);transition:filter .15s ease-out}nav a:hover img,nav a:focus-visible img,nav a:active img{filter:grayscale(0)}nav a:focus-visible{outline:1px solid #777;outline-offset:8px}.arrow{font-size:24px;line-height:28px;margin-top:12px}.label{position:absolute;top:-24px;white-space:nowrap;font-size:14px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.sr-only:focus-within{clip-path:none;width:auto;height:auto;left:20px;top:20px;z-index:2;background:white;padding:8px}#error{position:absolute;top:20px;left:20px}@media(prefers-reduced-motion:reduce){nav{transition:none}}@media(max-height:400px){nav img{width:48px;height:48px}nav a{min-height:76px}.arrow{margin-top:4px}}
+
+.icon{display:block;position:relative;width:64px;height:64px;flex:none}.icon img{position:absolute;inset:0;filter:none;transition:opacity .15s ease-out}.icon .active{opacity:0}nav a:hover .active,nav a:focus-visible .active,nav a:active .active{opacity:1}nav a:hover .inactive,nav a:focus-visible .inactive,nav a:active .inactive{opacity:1}.arrow{color:#252525}@media(max-height:400px){.icon{width:48px;height:48px}}
+
+.arrow{opacity:var(--arrow-opacity,0)}
+/* Five controls share one row, including narrow phones. */
+nav{width:min(760px,94vw);justify-content:space-between;gap:clamp(6px,2vw,40px)}nav a{width:64px;min-width:44px;min-height:100px}.icon,nav .icon img{width:64px;height:64px}nav img.arrow{position:static;width:24px;height:24px;object-fit:contain;filter:none;margin-top:12px;opacity:var(--arrow-opacity,0)}
+@media(max-width:420px){.icon,nav .icon img{width:48px;height:48px}nav a{width:52px;min-height:84px}}
+@media(max-height:440px){.icon,nav .icon img{width:40px;height:40px}nav a{min-height:72px}nav img.arrow{margin-top:6px;width:20px;height:20px}}
+
+/* Half-size visual group; keep touch targets usable. */
+nav{width:min(380px,47vw);gap:clamp(3px,1vw,20px)}
+nav a{width:32px;min-width:32px;min-height:50px}
+.icon,nav .icon img{width:32px;height:32px}
+nav img.arrow{width:12px;height:12px;margin-top:6px}
+html,body{color:#2E3033}.arrow{color:#2E3033}
+@media(max-width:420px){nav{width:min(240px,80vw);gap:0}nav a{min-width:44px;min-height:44px}.icon,nav .icon img{width:24px;height:24px}}
+@media(max-height:440px){.icon,nav .icon img{width:20px;height:20px}nav a{min-height:44px}nav img.arrow{width:10px;height:10px;margin-top:3px}}
+
+/* Equal columns keep the first and fifth controls equally inset. */
+nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;justify-items:center;padding:0}nav a{width:100%;min-width:0;align-items:center}
+
+nav{grid-template-columns:repeat(4,minmax(0,1fr));width:min(304px,47vw)}html,body,.arrow{color:#A8C1EF}@media(max-width:420px){nav{width:min(192px,80vw)}}
+
+/* Corner controls: outer icon edges are inset by 5% of viewport width. */
+nav{inset:0;top:0;left:0;width:100%;height:100%;display:block;transform:none!important;pointer-events:none!important}
+nav a{position:absolute;width:32px;min-height:32px;pointer-events:none}
+body.ready nav a{pointer-events:auto}
+.link-linkedin{left:5vw;top:5vw}.link-pdf{right:5vw;top:5vw}
+.link-behance{left:5vw;bottom:5vw}.link-telegram{right:5vw;bottom:5vw}
+.link-linkedin,.link-pdf{transform:translateY(calc(-1 * var(--icon-travel,120px)))}
+.link-behance,.link-telegram{transform:translateY(var(--icon-travel,120px))}
+.icon .inactive{position:absolute;inset:0;display:block;background:linear-gradient(#2E3033,#121417);mask-image:var(--logo);-webkit-mask-image:var(--logo);mask-size:contain;-webkit-mask-size:contain;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;mask-position:center;-webkit-mask-position:center;transition:opacity .15s ease-out}
+@media(max-width:420px){nav a{width:24px;min-height:24px}}
+@media(max-height:440px){nav a{width:20px;min-height:20px}}
+
+/* One solid color in every interaction state; no overlapping color image. */
+.icon .inactive,nav a:hover .inactive,nav a:focus-visible .inactive,nav a:active .inactive{background:#616367;opacity:1}
+
+/* Restore official color artwork on hover; inactive stays neutral. */
+.icon .inactive{background:#616367}
+nav a:hover .inactive,nav a:focus-visible .inactive,nav a:active .inactive{opacity:1}
+nav a:hover .active,nav a:focus-visible .active,nav a:active .active{opacity:1}
+.link-linkedin{transform:translate(calc(-1 * var(--icon-travel,120px)),calc(-1 * var(--icon-travel,120px)))}
+.link-pdf{transform:translate(var(--icon-travel,120px),calc(-1 * var(--icon-travel,120px)))}
+.link-behance{transform:translate(calc(-1 * var(--icon-travel,120px)),var(--icon-travel,120px))}
+.link-telegram{transform:translate(var(--icon-travel,120px),var(--icon-travel,120px))}
+
+/* Stable gray base; only the official-color overlay fades. */
+.icon .inactive{opacity:1;transition:none;z-index:0}.icon .active{z-index:1;pointer-events:none}.icon{pointer-events:none}
