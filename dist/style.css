@@ -53,3 +53,16 @@ nav a:hover .active,nav a:focus-visible .active,nav a:active .active{opacity:1}
 html,body{background:linear-gradient(#f7fafe,#fff8ed)}
 nav .icon img.logo{opacity:1;filter:grayscale(1);transform:scale(1);transition:filter .15s ease-out,transform .15s ease-out}
 nav a:hover .icon img.logo,nav a:focus-visible .icon img.logo,nav a:active .icon img.logo{filter:grayscale(0);transform:scale(1.1)}
+
+/* Full-bleed backdrop; controls remain clear of notches and home indicator. */
+html,body{background:var(--page-background,linear-gradient(#f7fafe,#fff8ed));background-attachment:fixed;overscroll-behavior:none}
+.link-linkedin{left:max(5vw,env(safe-area-inset-left));top:max(5vw,env(safe-area-inset-top))}
+.link-behance{left:auto;bottom:auto;right:max(5vw,env(safe-area-inset-right));top:max(5vw,env(safe-area-inset-top));transform:translate(var(--icon-travel,120px),calc(-1 * var(--icon-travel,120px)))}
+.link-pdf{right:auto;top:auto;left:max(5vw,env(safe-area-inset-left));bottom:max(5vw,env(safe-area-inset-bottom));transform:translate(calc(-1 * var(--icon-travel,120px)),var(--icon-travel,120px))}
+.link-telegram{right:max(5vw,env(safe-area-inset-right));bottom:max(5vw,env(safe-area-inset-bottom))}
+nav .icon{transition:transform .15s ease-out}
+nav .icon img.state-idle,nav .icon img.state-hover{filter:none;transform:none;transition:opacity .15s ease-out}
+nav .icon img.state-idle{opacity:1}
+nav .icon img.state-hover{opacity:0}
+nav a:hover .icon img.state-hover,nav a:focus-visible .icon img.state-hover,nav a:active .icon img.state-hover{opacity:1}
+nav a:hover .icon,nav a:focus-visible .icon,nav a:active .icon{transform:scale(1.1)}

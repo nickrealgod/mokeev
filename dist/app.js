@@ -21,7 +21,13 @@ const backgrounds=[
   [[0,[251,248,255]],[1,[251,248,255]]],
   [[0,[208,219,230]],[.5,[231,234,241]],[1,[228,232,239]]]
 ];
-function changeBackground(){backgroundIndex=(backgroundIndex+1)%backgrounds.length;}
+function syncPageBackground(){
+  const stops=backgrounds[backgroundIndex];
+  document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
+  document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
+}
+function changeBackground(){backgroundIndex=(backgroundIndex+1)%backgrounds.length;syncPageBackground();}
+syncPageBackground();
 const all = Object.values(data.letters).flatMap(v => Object.values(v));
 const bounds = { x:Math.min(...all.map(v=>v.x)), y:Math.min(...all.map(v=>v.y)), right:Math.max(...all.map(v=>v.x+v.w)), bottom:Math.max(...all.map(v=>v.y+v.h)) };
 const center=[(bounds.x+bounds.right)/2,(bounds.y+bounds.bottom)/2];
