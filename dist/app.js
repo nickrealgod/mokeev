@@ -32,7 +32,7 @@ const all = Object.values(data.letters).flatMap(v => Object.values(v));
 const bounds = { x:Math.min(...all.map(v=>v.x)), y:Math.min(...all.map(v=>v.y)), right:Math.max(...all.map(v=>v.x+v.w)), bottom:Math.max(...all.map(v=>v.y+v.h)) };
 const center=[(bounds.x+bounds.right)/2,(bounds.y+bounds.bottom)/2];
 const baseline=Math.max(...order.slice(0,6).map(key=>data.letters[key].black.y+data.letters[key].black.h));
-const euro=data.letters['€'].black, focus=[euro.x+euro.w/2,euro.y+euro.h/2];
+const euro=data.letters['€'].black, focus=[euro.x+euro.w*.6,euro.y+euro.h/2];
 nav.inert = true;
 function resize() {
   w=innerWidth; h=innerHeight;
@@ -189,7 +189,10 @@ function draw(now) {
   const renderRatio=desiredZoom*euro.w*(canvas.width/w)/sourceWidth;
   const density=[.5,1].reduce((a,b)=>Math.abs(b-renderRatio)<Math.abs(a-renderRatio)?b:a);
   const initialZoom=Math.abs(density/renderRatio-1)<=.2?desiredZoom*density/renderRatio:desiredZoom;
-  const zoom=2*initialZoom*(1-ease)+fit*ease, angle=(1-ease)*Math.PI/2;
+  const openingEase=easeOut(progress(elapsed,0,timeline.hold));
+  // Shrink 38% while rotated, then continue from that exact scale into the turn.
+  const openingZoom=2*initialZoom*(1-.38*openingEase);
+  const zoom=openingZoom*(1-ease)+fit*ease, angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
   const background=ctx.createLinearGradient(0,0,0,h);
