@@ -66,3 +66,13 @@ nav .icon img.state-idle{opacity:1}
 nav .icon img.state-hover{opacity:0}
 nav a:hover .icon img.state-hover,nav a:focus-visible .icon img.state-hover,nav a:active .icon img.state-hover{opacity:1}
 nav a:hover .icon,nav a:focus-visible .icon,nav a:active .icon{transform:scale(1.1)}
+
+/* SVG viewBoxes include transparent bleed; the larger image box preserves artwork size. */
+nav a{overflow:visible}
+nav a::before{content:"";position:absolute;inset:-50%;pointer-events:auto}
+nav .icon,nav a:hover .icon,nav a:focus-visible .icon,nav a:active .icon{transform:none;overflow:visible;transition:none}
+nav .icon img.state-idle,nav .icon img.state-hover{inset:-6.25%;width:112.5%;height:112.5%;object-fit:contain;object-position:center;transform-origin:center;filter:none}
+nav .icon img.state-idle{opacity:1;visibility:visible;transform:none;transition:visibility 0s}
+nav .icon img.state-hover{opacity:0;transform:scale(1);transition:opacity .15s ease-out,transform .15s ease-out}
+nav a:hover .icon img.state-idle,nav a:focus-visible .icon img.state-idle,nav a:active .icon img.state-idle{visibility:hidden;transition:visibility 0s .15s}
+nav a:hover .icon img.state-hover,nav a:focus-visible .icon img.state-hover,nav a:active .icon img.state-hover{opacity:1;transform:scale(1.1)}
