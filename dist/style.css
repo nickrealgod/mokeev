@@ -69,7 +69,7 @@ nav a:hover .icon,nav a:focus-visible .icon,nav a:active .icon{transform:scale(1
 
 /* SVG viewBoxes include transparent bleed; the larger image box preserves artwork size. */
 nav a{overflow:visible}
-nav a::before{content:"";position:absolute;inset:-50%;pointer-events:auto}
+nav a::before{content:"";position:absolute;inset:-50%;pointer-events:inherit}
 nav .icon,nav a:hover .icon,nav a:focus-visible .icon,nav a:active .icon{transform:none;overflow:visible;transition:none}
 nav .icon img.state-idle,nav .icon img.state-hover{inset:-6.25%;width:112.5%;height:112.5%;object-fit:contain;object-position:center;transform-origin:center;filter:none}
 nav .icon img.state-idle{opacity:1;visibility:visible;transform:none;transition:visibility 0s}
