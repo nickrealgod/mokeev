@@ -1,8 +1,8 @@
-// Icon glitch adapted from the user-supplied CodeFronts CSS Text Glitch Hover Effect (MIT).
+// Independent floating lights.
 'use strict';
 window.SiteEffects=(()=>{
   let target=0,opacity=0,last=null,suppressed=false,birth=null;
-  const dots=Array.from({length:5},(_,index)=>{
+  const dots=Array.from({length:9},(_,index)=>{
     const dot=document.createElement('div');dot.className='floating-dot';dot.setAttribute('aria-hidden','true');document.body.append(dot);
     return {dot,index,pulseAt:0,from:Math.random(),to:Math.random(),duration:1700+Math.random()*600,
       phases:Array.from({length:6},()=>Math.random()*Math.PI*2),speeds:Array.from({length:6},()=>.035+Math.random()*.055)};
@@ -23,14 +23,8 @@ window.SiteEffects=(()=>{
       const pulse=reduced?.4:d.from+(d.to-d.from)*smooth(Math.min(1,(now-d.pulseAt)/d.duration));
       dot.style.width=dot.style.height=(1+3*pulse)+'px';dot.style.filter='blur('+(2*pulse)+'px)';
       dot.style.transform='translate(-50%,-50%)';
-      dot.style.left=(reduced?w*(.2+d.index*.15):coordinate(0,w))+'px';dot.style.top=(reduced?h*(.3+(d.index%3)*.2):coordinate(3,h))+'px';
+      dot.style.left=(reduced?w*(.2+(d.index%3)*.3):coordinate(0,w))+'px';dot.style.top=(reduced?h*(.2+Math.floor(d.index/3)*.3):coordinate(3,h))+'px';
     }
   }
-  document.querySelectorAll('nav a').forEach(link=>{
-    const icon=link.querySelector('.icon'),img=icon.querySelector('.state-hover');
-    icon.style.setProperty('--glitch-mask','url("'+img.getAttribute('src')+'")');
-    icon.style.setProperty('--glitch-a','#FF0000');icon.style.setProperty('--glitch-b','#FFFFFF');
-    const yellow=document.createElement('span');yellow.className='glitch-yellow';yellow.setAttribute('aria-hidden','true');icon.append(yellow);
-  });
   return {showDot,hideDot,drawDot};
 })();
