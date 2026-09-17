@@ -83,4 +83,9 @@ nav a:hover .icon img.state-idle,nav a:focus-visible .icon img.state-idle,nav a:
 
 .floating-dot{position:fixed;left:50%;top:50%;width:1px;height:1px;border-radius:50%;background:#fff;opacity:0;z-index:2147483647;pointer-events:none;will-change:transform,opacity;}
 
-.floating-dot{mix-blend-mode:hard-light}
+.floating-dot{mix-blend-mode:normal}
+
+/* Radius = twice the shared icon height; the glow never enlarges the hit target. */
+nav .icon::before{content:"";position:absolute;left:50%;top:50%;width:400%;height:400%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle closest-side,#fff 0%,rgba(255,255,255,0) 100%);opacity:0;pointer-events:none;z-index:0}
+nav .icon img.state-idle,nav .icon img.state-hover{z-index:1}
+nav a:is(:hover,:focus-visible,:active) .icon::before{opacity:1}
