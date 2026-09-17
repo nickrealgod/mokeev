@@ -14,7 +14,7 @@ const introEnd = iconsEnd + timeline.arrows;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, lastWheel=0, wheelDelta=0, lastScrollFamily='black', scrollCycleIndex=0;
-let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, wheelConsumed=false, letteringY=0,scrollShift=0;
+let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -44,7 +44,7 @@ function paintNoisyBackground(){
   ctx.drawImage(noisyBackground,0,0,w,h);
 }
 function syncPageBackground(){
-  document.body.classList.toggle("no-icon-glow",backgroundIndex===4||backgroundIndex===6);
+  document.body.classList.toggle("no-icon-glow",backgroundIndex>=3);
   const stops=backgrounds[backgroundIndex];
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
@@ -186,12 +186,21 @@ addEventListener('wheel',e=>{
   if(e.ctrlKey||!ready) return;
   e.preventDefault();
   if(Math.abs(e.deltaY)>Math.abs(e.deltaX))window.SiteEffects.scrollImpulse(e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?h:1));
-  const now=performance.now(),quiet=now-lastWheelEvent>180;lastWheelEvent=now;
-  if(quiet){wheelConsumed=false;wheelDelta=0;}
+  const now=performance.now();
+  const dx=e.deltaX*(e.deltaMode===1?16:e.deltaMode===2?w:1);
+  const dy=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?h:1);
+  const magnitude=Math.max(Math.abs(dx),Math.abs(dy)),direction=wheelDirection(dx,dy);
+  const gap=now-lastWheelEvent;
+  const newGesture=gap>90||direction!==lastWheelDirection||
+    (now>=waveUntil&&magnitude>=12&&magnitude>lastWheelMagnitude*1.8);
+  lastWheelEvent=now;lastWheelMagnitude=magnitude;lastWheelDirection=direction;
+  if(newGesture){wheelConsumed=false;wheelDelta=0;}
+  // Never queue a second wave while one is running; discard the inertial tail.
   if(now<waveUntil){wheelConsumed=true;wheelDelta=0;return;}
   if(wheelConsumed)return;
-  wheelDelta+=Math.max(Math.abs(e.deltaX),Math.abs(e.deltaY));
-  if(wheelDelta>=24&&now-lastWheel>=70){changeAll(wheelDirection(e.deltaX,e.deltaY));lastWheel=now;wheelDelta=0;wheelConsumed=true;}
+  wheelDelta+=magnitude;
+  if(wheelDelta>=24){changeAll(direction);lastWheel=now;wheelDelta=0;wheelConsumed=true;}
+
 },{passive:false});
 items.forEach(item=>{
   const button=document.createElement('button');

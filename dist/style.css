@@ -91,3 +91,7 @@ nav .icon img.state-idle,nav .icon img.state-hover{z-index:1}
 nav a:is(:hover,:focus-visible,:active) .icon::before{opacity:1}
 
 body.no-icon-glow nav a:is(:hover,:focus-visible,:active) .icon::before{opacity:0}
+
+/* Keep the color-bearing core crisp: blurring a 1–4px dot erased its saturation. */
+.floating-dot{filter:none}
+.floating-dot::before{content:"";position:absolute;inset:0;border-radius:inherit;background:inherit;filter:blur(var(--dot-blur,0px));pointer-events:none}

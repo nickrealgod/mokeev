@@ -31,7 +31,7 @@ window.SiteEffects=(()=>{
       }
       if(now-d.pulseAt>=d.duration){d.from=d.to;d.to=Math.random();d.pulseAt=now;d.duration=1700+Math.random()*600;}
       const pulse=reduced?.4:d.from+(d.to-d.from)*smooth(Math.min(1,(now-d.pulseAt)/d.duration));
-      dot.style.width=dot.style.height=(1+3*pulse)+'px';dot.style.filter='blur('+(2*pulse)+'px)';
+      dot.style.width=dot.style.height=(1+3*pulse)+'px';dot.style.setProperty('--dot-blur',(2*pulse)+'px');
       dot.style.transform='translate(-50%,-50%)';
       dot.style.left=(12+Math.max(0,w-24)*d.x)+'px';dot.style.top=(12+Math.max(0,h-24)*d.y)+'px';
     }
