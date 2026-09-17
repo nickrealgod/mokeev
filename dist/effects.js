@@ -2,8 +2,9 @@
 'use strict';
 window.SiteEffects=(()=>{
   let target=0,opacity=0,last=null,suppressed=false,birth=null;
-  const dots=Array.from({length:13},(_,index)=>{
-    const dot=document.createElement('div');dot.className='floating-dot';dot.setAttribute('aria-hidden','true');dot.style.background=index===12?'#F5B234':'#FFFFFF';document.body.append(dot);
+  const colors=['#FFF8F2','#FEFBDA','#FFF7F6','#F1FEED','#F9F9FE','#F7FAFE',...Array(6).fill('#FFFFFF'),'#F5B234','#7600FF','#0082FF','#FFEC00','#64FF00','#FF0040'];
+  const dots=colors.map((color,index)=>{
+    const dot=document.createElement('div');dot.className='floating-dot';dot.setAttribute('aria-hidden','true');dot.style.background=color;document.body.append(dot);
     return {dot,index,x:Math.random(),y:Math.random(),pulseAt:0,from:Math.random(),to:Math.random(),duration:1700+Math.random()*600,
       phases:Array.from({length:6},()=>Math.random()*Math.PI*2),speeds:Array.from({length:6},()=>.035+Math.random()*.055)};
   });
@@ -22,8 +23,8 @@ window.SiteEffects=(()=>{
       const vx=10*Math.sin(t*speeds[0]+phases[0])+5*Math.sin(t*speeds[1]+phases[1]);
       const vy=10*Math.sin(t*speeds[3]+phases[3])+5*Math.sin(t*speeds[4]+phases[4]);
       if(!reduced){
-        d.x+=(vx>0?vx*1.24:vx)*dt/1000/w;
-        d.y+=(vy<0?vy*1.62:vy)*dt/1000/h;
+        d.x+=(vx>0?vx*(1+1.62):vx)*dt/1000/w;
+        d.y+=(vy<0?vy*(1+2.62):vy)*dt/1000/h;
         // Re-enter inside the opposite edge in the same frame, preserving color/count.
         if(d.x<0)d.x=.99;else if(d.x>1)d.x=.01;
         if(d.y<0)d.y=.99;else if(d.y>1)d.y=.01;

@@ -21,9 +21,30 @@ const backgrounds=[
   [[0,[251,248,255]],[1,[251,248,255]]],
   [[0,[208,219,230]],[.5,[231,234,241]],[1,[228,232,239]]],
   [[0,[190,193,197]],[1,[190,193,197]]],
-  [[0,[228,231,235]],[1,[228,231,235]]]
+  [[0,[228,231,235]],[1,[228,231,235]]],
+  [[0,[192,192,196]],[1,[190,193,197]]]
 ];
+const noisyBackground=document.createElement('canvas');
+function paintNoisyBackground(){
+  if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
+    noisyBackground.width=canvas.width;noisyBackground.height=canvas.height;
+    const nctx=noisyBackground.getContext('2d'),pixels=nctx.createImageData(canvas.width,canvas.height);
+    const top=[192,192,196],bottom=[190,193,197];
+    for(let y=0;y<canvas.height;y++){
+      const t=y/Math.max(1,canvas.height-1);
+      for(let x=0;x<canvas.width;x++){
+        const i=(y*canvas.width+x)*4;
+        // Independent RGB noise, uniform in ±2% of the 8-bit range; cached, not animated.
+        for(let c=0;c<3;c++)pixels.data[i+c]=Math.round(top[c]+(bottom[c]-top[c])*t+(Math.random()*2-1)*255*.02);
+        pixels.data[i+3]=255;
+      }
+    }
+    nctx.putImageData(pixels,0,0);
+  }
+  ctx.drawImage(noisyBackground,0,0,w,h);
+}
 function syncPageBackground(){
+  document.body.classList.toggle("no-icon-glow",backgroundIndex===4||backgroundIndex===6);
   const stops=backgrounds[backgroundIndex];
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
@@ -216,6 +237,7 @@ function draw(now) {
   const blend=rgb=>'rgb('+rgb.join(',')+')';
   backgrounds[backgroundIndex].forEach(([position,color])=>background.addColorStop(position,blend(color)));
   ctx.fillStyle=background;ctx.fillRect(0,0,w,h);
+  if(backgroundIndex===6)paintNoisyBackground();
   nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
   nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);
   document.body.style.setProperty('--arrow-opacity',String(arrowEase));
