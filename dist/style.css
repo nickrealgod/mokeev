@@ -82,3 +82,5 @@ nav .icon,nav .icon img.state-idle,nav .icon img.state-hover,
 nav a:hover .icon img.state-idle,nav a:focus-visible .icon img.state-idle,nav a:active .icon img.state-idle{transition:none!important}
 
 .floating-dot{position:fixed;left:50%;top:50%;width:1px;height:1px;border-radius:50%;background:#fff;opacity:0;z-index:2147483647;pointer-events:none;will-change:transform,opacity;}
+
+.floating-dot{mix-blend-mode:hard-light}

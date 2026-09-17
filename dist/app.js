@@ -14,12 +14,14 @@ const introEnd = iconsEnd + timeline.arrows;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, lastWheel=0, wheelDelta=0, lastScrollFamily='black', scrollCycleIndex=0;
-let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, wheelConsumed=false, letteringY=0;
+let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, wheelConsumed=false, letteringY=0,scrollShift=0;
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
   [[0,[251,248,255]],[1,[251,248,255]]],
-  [[0,[208,219,230]],[.5,[231,234,241]],[1,[228,232,239]]]
+  [[0,[208,219,230]],[.5,[231,234,241]],[1,[228,232,239]]],
+  [[0,[190,193,197]],[1,[190,193,197]]],
+  [[0,[228,231,235]],[1,[228,231,235]]]
 ];
 function syncPageBackground(){
   const stops=backgrounds[backgroundIndex];
@@ -126,7 +128,7 @@ function maskHit(v,x,y) {
 }
 function hit(x,y) {
   if (!ready) return null;
-  const px=(x-w/2)/fit+center[0],py=(y-letteringY)/fit+center[1];
+  const px=(x-w/2)/fit+center[0],py=(y-letteringY-scrollShift)/fit+center[1];
   for (const item of [...items].reverse()) {
     const v=item.variants[item.style],ix=Math.floor(px-v.x-item.x/fit),iy=Math.floor(py-v.y-item.y/fit);
     if (ix>=0&&iy>=0&&ix<v.w&&iy<v.h&&maskHit(v,ix,iy)) return item;
@@ -153,7 +155,7 @@ canvas.addEventListener('pointerup',e=>{
   const g=gesture;gesture=null;
   if(!ready)return;
   const dx=e.clientX-g.x,dy=e.clientY-g.y;
-  if(Math.hypot(dx,dy)>=24){if(g.type!=='mouse')changeAll(gestureDirection(dx,dy));}
+  if(Math.hypot(dx,dy)>=24){if(g.type!=='mouse'){if(Math.abs(dy)>Math.abs(dx))window.SiteEffects.scrollImpulse(-dy);changeAll(gestureDirection(dx,dy));}}
   else if(g.item){if(g.type!=='mouse')change(g.item);}
   else changeBackground();
 });
@@ -162,6 +164,7 @@ canvas.addEventListener('lostpointercapture',()=>gesture=null);
 addEventListener('wheel',e=>{
   if(e.ctrlKey||!ready) return;
   e.preventDefault();
+  if(Math.abs(e.deltaY)>Math.abs(e.deltaX))window.SiteEffects.scrollImpulse(e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?h:1));
   const now=performance.now(),quiet=now-lastWheelEvent>180;lastWheelEvent=now;
   if(quiet){wheelConsumed=false;wheelDelta=0;}
   if(now<waveUntil){wheelConsumed=true;wheelDelta=0;return;}
@@ -179,6 +182,7 @@ items.forEach(item=>{
 function draw(now) {
   if(start===null) start=now;
   advanceWave(now);
+  scrollShift=window.SiteEffects.scrollOffset(now,reduce.matches);
   const elapsed=now-start;
   const turn=progress(elapsed,550,cameraEnd-550);
   const ease=turn*turn*(3-2*turn);
@@ -216,6 +220,7 @@ function draw(now) {
   nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);
   document.body.style.setProperty('--arrow-opacity',String(arrowEase));
   ctx.translate(w/2,h*.5*(1-ease)+letteringY*ease);ctx.rotate(angle);ctx.scale(zoom,zoom);ctx.translate(-cx,-cy);
+  ctx.save();ctx.translate(0,scrollShift/fit);
   for(const item of items){
     if(ready&&!reduce.matches){
       if(now-item.driftAt>=2000){item.from=[item.x,item.y];item.to=[Math.random()*4-2,Math.random()*4-2];item.driftAt=now;}
@@ -226,6 +231,7 @@ function draw(now) {
     paintLetter(ctx,item,now);
     if(focused===item){ctx.strokeStyle='#999';ctx.lineWidth=1/fit;ctx.strokeRect(v.x,v.y,v.w,v.h);}
   }
+  ctx.restore();
   {
     // Mirror the live artwork, including the current gradient surfaces and drift.
     const height=(bounds.bottom-bounds.y)*fit;
@@ -242,7 +248,7 @@ function draw(now) {
     fade.addColorStop(0,'rgba(0,0,0,0.09)');fade.addColorStop(1,'rgba(0,0,0,0)');
     rc.globalCompositeOperation='destination-in';rc.fillStyle=fade;rc.fillRect(0,0,w,height+6);rc.globalCompositeOperation='source-over';
     // Reflection is part of the same world: camera rotation and zoom apply to both.
-    ctx.drawImage(reflection,center[0]-w/(2*fit),center[1]+(reflectionTop-3-letteringY)/fit,w/fit,(height+6)/fit);
+    ctx.drawImage(reflection,center[0]-w/(2*fit),center[1]+(reflectionTop-3-letteringY-scrollShift)/fit,w/fit,(height+6)/fit);
   }
   window.SiteEffects.drawDot(now,w,h,reduce.matches);
   raf=requestAnimationFrame(draw);
