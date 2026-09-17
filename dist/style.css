@@ -76,3 +76,7 @@ nav .icon img.state-idle{opacity:1;visibility:visible;transform:none;transition:
 nav .icon img.state-hover{opacity:0;transform:scale(1);transition:opacity .15s ease-out,transform .15s ease-out}
 nav a:hover .icon img.state-idle,nav a:focus-visible .icon img.state-idle,nav a:active .icon img.state-idle{visibility:hidden;transition:visibility 0s .15s}
 nav a:hover .icon img.state-hover,nav a:focus-visible .icon img.state-hover,nav a:active .icon img.state-hover{opacity:1;transform:scale(1.1)}
+
+/* Hover switches immediately; intro corner movement remains controlled by the camera timeline. */
+nav .icon,nav .icon img.state-idle,nav .icon img.state-hover,
+nav a:hover .icon img.state-idle,nav a:focus-visible .icon img.state-idle,nav a:active .icon img.state-idle{transition:none!important}

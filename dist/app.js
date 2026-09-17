@@ -13,7 +13,7 @@ const iconsEnd = cameraEnd + timeline.icons;
 const introEnd = iconsEnd + timeline.arrows;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
-let hover=null, focused=null, lastWheel=0, wheelDelta=0, lastScrollFamily='black';
+let hover=null, focused=null, lastWheel=0, wheelDelta=0, lastScrollFamily='black', scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, wheelConsumed=false, letteringY=0;
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
@@ -73,7 +73,10 @@ function apply(item, style, gradient) {
 }
 function change(item) {
   if(performance.now()<waveUntil)return;
-  const choices=Object.keys(item.variants).filter(s=>s!==item.style);
+  const available=Object.keys(item.variants).filter(s=>s!==item.style);
+  const preferred=available.filter(s=>['color','irridicent'].includes(s));
+  const other=available.filter(s=>!preferred.includes(s));
+  const choices=Math.random()<Math.min(1,2*preferred.length/available.length)?preferred:other;
   if (!choices.length) return;
   const style=pick(choices); apply(item,style,nextGradient(item.cycles,style));item.pulseAt=performance.now();
 }
@@ -82,7 +85,9 @@ function changeAll(direction='ltr') {
   if(now<waveUntil)return;
   const groups=commonFamilies(items);
   if(groups.length<2)return;
-  const group=groups[(groups.indexOf(lastScrollFamily)+1)%groups.length];
+  const cycle=['black','color','irridicent','white','color','irridicent','silver','color','irridicent','play','color','irridicent'].filter(s=>groups.includes(s));
+  scrollCycleIndex=(scrollCycleIndex+1)%cycle.length;
+  const group=cycle[scrollCycleIndex];
   const gradients=['color','irridicent'].includes(group)?gradientSet(items.length):items.map(()=>-1);
   items.forEach((item,index)=>{
     const style=pick(options(item,group));
@@ -175,7 +180,9 @@ items.forEach(item=>{
 function draw(now) {
   if(start===null) start=now;
   advanceWave(now);
-  const elapsed=now-start, ease=easeOut(progress(elapsed,timeline.hold,timeline.camera));
+  const elapsed=now-start;
+  const turn=progress(elapsed,550,cameraEnd-550);
+  const ease=turn*turn*(3-2*turn);
   const iconEase=easeOut(progress(elapsed,cameraEnd,timeline.icons));
   const arrowEase=easeOut(progress(elapsed,iconsEnd,timeline.arrows));
   if((reduce.matches||elapsed>=introEnd)&&!ready){
@@ -189,10 +196,17 @@ function draw(now) {
   const renderRatio=desiredZoom*euro.w*(canvas.width/w)/sourceWidth;
   const density=[.5,1].reduce((a,b)=>Math.abs(b-renderRatio)<Math.abs(a-renderRatio)?b:a);
   const initialZoom=Math.abs(density/renderRatio-1)<=.2?desiredZoom*density/renderRatio:desiredZoom;
-  const openingEase=easeOut(progress(elapsed,0,timeline.hold));
-  // Shrink 38% while rotated, then continue from that exact scale into the turn.
-  const openingZoom=2*initialZoom*(1-.38*openingEase);
-  const zoom=openingZoom*(1-ease)+fit*ease, angle=(1-ease)*Math.PI/2;
+  // Cubic Hermite segments share position and velocity at 750 ms.
+  const startZoom=2*initialZoom,midZoom=startZoom*.62;
+  const joinSpeed=-(midZoom-fit)/timeline.camera;
+  const hermite=(a,b,va,vb,t,d)=>{
+    const t2=t*t,t3=t2*t;
+    return (2*t3-3*t2+1)*a+(t3-2*t2+t)*d*va+(-2*t3+3*t2)*b+(t3-t2)*d*vb;
+  };
+  const zoom=reduce.matches?fit:elapsed<timeline.hold
+    ?hermite(startZoom,midZoom,-(startZoom-midZoom)/timeline.hold,joinSpeed,progress(elapsed,0,timeline.hold),timeline.hold)
+    :hermite(midZoom,fit,joinSpeed,0,progress(elapsed,timeline.hold,timeline.camera),timeline.camera);
+  const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
   const background=ctx.createLinearGradient(0,0,0,h);
