@@ -26,7 +26,7 @@ function syncPageBackground(){
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
 }
-function changeBackground(){backgroundIndex=(backgroundIndex+1)%backgrounds.length;syncPageBackground();}
+function changeBackground(){window.SiteEffects.hideDot();backgroundIndex=(backgroundIndex+1)%backgrounds.length;syncPageBackground();}
 syncPageBackground();
 const all = Object.values(data.letters).flatMap(v => Object.values(v));
 const bounds = { x:Math.min(...all.map(v=>v.x)), y:Math.min(...all.map(v=>v.y)), right:Math.max(...all.map(v=>v.x+v.w)), bottom:Math.max(...all.map(v=>v.y+v.h)) };
@@ -73,11 +73,9 @@ function apply(item, style, gradient) {
 }
 function change(item) {
   if(performance.now()<waveUntil)return;
-  const available=Object.keys(item.variants).filter(s=>s!==item.style);
-  const preferred=available.filter(s=>['color','irridicent'].includes(s));
-  const other=available.filter(s=>!preferred.includes(s));
-  const choices=Math.random()<Math.min(1,2*preferred.length/available.length)?preferred:other;
+  const choices=Object.keys(item.variants).filter(s=>s!==item.style);
   if (!choices.length) return;
+  window.SiteEffects.showDot(true);
   const style=pick(choices); apply(item,style,nextGradient(item.cycles,style));item.pulseAt=performance.now();
 }
 function changeAll(direction='ltr') {
@@ -85,9 +83,10 @@ function changeAll(direction='ltr') {
   if(now<waveUntil)return;
   const groups=commonFamilies(items);
   if(groups.length<2)return;
-  const cycle=['black','color','irridicent','white','color','irridicent','silver','color','irridicent','play','color','irridicent'].filter(s=>groups.includes(s));
+  const cycle=['black','white','silver','color','irridicent','play'].filter(s=>groups.includes(s));
   scrollCycleIndex=(scrollCycleIndex+1)%cycle.length;
   const group=cycle[scrollCycleIndex];
+  window.SiteEffects.showDot(false);
   const gradients=['color','irridicent'].includes(group)?gradientSet(items.length):items.map(()=>-1);
   items.forEach((item,index)=>{
     const style=pick(options(item,group));
@@ -245,6 +244,7 @@ function draw(now) {
     // Reflection is part of the same world: camera rotation and zoom apply to both.
     ctx.drawImage(reflection,center[0]-w/(2*fit),center[1]+(reflectionTop-3-letteringY)/fit,w/fit,(height+6)/fit);
   }
+  window.SiteEffects.drawDot(now,w,h,reduce.matches);
   raf=requestAnimationFrame(draw);
 }
 document.addEventListener('visibilitychange',()=>{

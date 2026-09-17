@@ -80,3 +80,13 @@ nav a:hover .icon img.state-hover,nav a:focus-visible .icon img.state-hover,nav 
 /* Hover switches immediately; intro corner movement remains controlled by the camera timeline. */
 nav .icon,nav .icon img.state-idle,nav .icon img.state-hover,
 nav a:hover .icon img.state-idle,nav a:focus-visible .icon img.state-idle,nav a:active .icon img.state-idle{transition:none!important}
+
+#floating-dot{position:fixed;left:50%;top:50%;width:1px;height:1px;border-radius:50%;background:#fff;opacity:0;z-index:2147483647;pointer-events:none;will-change:transform,opacity;}
+/* RGB split adapted to SVG silhouettes: original logo stays readable beneath colored slices. */
+nav .icon::before,nav .icon::after{content:"";position:absolute;inset:-6.25%;z-index:3;opacity:0;pointer-events:none;mask:var(--glitch-mask) center/contain no-repeat;-webkit-mask:var(--glitch-mask) center/contain no-repeat;}
+nav .icon::before{background:var(--glitch-a)}nav .icon::after{background:var(--glitch-b)}
+nav a:is(:hover,:focus-visible,:active) .icon::before{opacity:.85;animation:icon-split-a .6s steps(2) infinite}
+nav a:is(:hover,:focus-visible,:active) .icon::after{opacity:.85;animation:icon-split-b .6s steps(2) infinite .1s}
+@keyframes icon-split-a{0%,100%{clip-path:inset(0 0 85%);transform:translateX(-2px) scale(1.1)}25%{clip-path:inset(30% 0 50%);transform:translateX(2px) scale(1.1)}50%{clip-path:inset(60% 0 20%);transform:translateX(-1px) scale(1.1)}75%{clip-path:inset(10% 0 70%);transform:translateX(2px) scale(1.1)}}
+@keyframes icon-split-b{0%,100%{clip-path:inset(50% 0 30%);transform:translateX(2px) scale(1.1)}25%{clip-path:inset(5% 0 80%);transform:translateX(-2px) scale(1.1)}50%{clip-path:inset(70% 0 15%);transform:translateX(1px) scale(1.1)}75%{clip-path:inset(20% 0 60%);transform:translateX(-2px) scale(1.1)}}
+@media(prefers-reduced-motion:reduce){nav .icon::before,nav .icon::after{animation:none!important;opacity:0!important}}

@@ -37,7 +37,7 @@ touch.hit=()=>({key:'M'});handlers.pointerdown(event(10,10));handlers.pointerup(
 handlers.pointerdown(event(10,10));handlers.pointercancel();handlers.pointerup(event(100,100));assert.deepEqual(touch.directions,["ltr","rtl","ltr","rtl"]);
 console.log('PASS: background tap, four swipe directions, single-letter tap, gesture cancellation.');
 
-const wave={performance:{now:()=>wave.now},now:1000,waveUntil:0,queuedWave:null,lastScrollFamily:'white',scrollCycleIndex:1,reduce:{matches:false},items:Array.from({length:10},()=>({style:'white',variants:{white:{},black:{}}})),commonFamilies:()=>['white','black'],pick:a=>a[0],options:()=>['black'],gradientSet:()=>[],apply:(item,style)=>item.style=style};
+const wave={window:{SiteEffects:{showDot:()=>{}}},performance:{now:()=>wave.now},now:1000,waveUntil:0,queuedWave:null,lastScrollFamily:'white',scrollCycleIndex:1,reduce:{matches:false},items:Array.from({length:10},()=>({style:'white',variants:{white:{},black:{}}})),commonFamilies:()=>['white','black'],pick:a=>a[0],options:()=>['black'],gradientSet:()=>[],apply:(item,style)=>item.style=style};
 vm.createContext(wave);vm.runInContext(source.slice(source.indexOf('function changeAll('),source.indexOf('function paintLetter(')),wave);
 wave.changeAll('rtl');assert.equal(wave.items[9].pending.at,1000);assert.equal(wave.items[0].pending.at,1225);assert.equal(wave.waveUntil,1425);
 wave.advanceWave(1000);assert.equal(wave.items[9].style,'black');assert.equal(wave.items[8].style,'white');
