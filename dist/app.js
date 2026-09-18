@@ -15,7 +15,7 @@ const reflection=document.createElement('canvas'), reflectionCtx=reflection.getC
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
-const backgroundOrder=[0,6,5,1,2,3,4];
+const backgroundOrder=[0,6,5,1,2,3,4,7];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -26,6 +26,21 @@ const backgrounds=[
   [[0,[192,192,196]],[1,[190,193,197]]]
 ];
 let cachedBackground=null, reflectionFade=null, lastIconEase=-1;
+let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true,flashActive=false,lastFlashOpacity=0;
+const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/background.jpg';
+let backgroundImageReady=false;
+backgroundImage.decode().then(()=>{backgroundImageReady=true;}).catch(error=>console.warn('Background unavailable',error));
+const tintedArtwork=new WeakMap();
+function artwork(image,width,height){
+  if(!flashActive)return image;
+  if(!tintedArtwork.has(image)){
+    const tint=document.createElement('canvas');tint.width=width;tint.height=height;
+    const paint=tint.getContext('2d');paint.drawImage(image,0,0,width,height);paint.globalCompositeOperation='source-in';
+    paint.fillStyle='#E4E7EB';paint.fillRect(0,0,tint.width,tint.height);tintedArtwork.set(image,tint);
+  }
+  return tintedArtwork.get(image);
+}
+nav.querySelectorAll('.icon').forEach(icon=>icon.style.setProperty('--flash-logo',`url("${icon.querySelector('.state-idle').getAttribute('src')}")`));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -47,11 +62,52 @@ function paintNoisyBackground(){
 }
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
+  if(backgroundOrder[backgroundIndex]===7){
+    document.documentElement.style.setProperty('--page-background','url("assets/background.jpg") center bottom / cover no-repeat #bec1c5');
+    document.querySelector('meta[name="theme-color"]').content='#bec1c5';return;
+  }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
 }
-function changeBackground(direction=1){cachedBackground=null;window.SiteEffects.hideDot();backgroundIndex=(backgroundIndex+direction+backgrounds.length)%backgrounds.length;syncPageBackground();}
+function changeBackground(direction=1){
+  autoBackground=false;backgroundTransition=null;window.SiteEffects.hideDot();
+  backgroundIndex=(backgroundIndex+direction+backgroundOrder.length)%backgroundOrder.length;syncPageBackground();
+}
+function advanceBackground(now){
+  if(nextAutoBackground===null)nextAutoBackground=now+15000;
+  if(autoBackground&&now>=nextAutoBackground){
+    const next=firstAutoBackground?4:(backgroundIndex+1)%backgroundOrder.length;
+    backgroundTransition={from:backgroundIndex,at:now};backgroundIndex=next;
+    firstAutoBackground=false;nextAutoBackground=now+15000;window.SiteEffects.hideDot();syncPageBackground();
+  }
+  if(backgroundTransition&&now-backgroundTransition.at>=2000)backgroundTransition=null;
+}
+function paintBackground(index){
+  const identity=backgroundOrder[index];
+  if(identity===6){paintNoisyBackground();return;}
+  if(identity===7){
+    if(backgroundImageReady){
+      const scale=Math.max(w/backgroundImage.naturalWidth,h/backgroundImage.naturalHeight);
+      const width=backgroundImage.naturalWidth*scale,height=backgroundImage.naturalHeight*scale;
+      ctx.drawImage(backgroundImage,(w-width)/2,h-height,width,height);
+    }else {ctx.fillStyle='#bec1c5';ctx.fillRect(0,0,w,h);}
+    return;
+  }
+  if(!cachedBackground)cachedBackground=new Map();
+  if(!cachedBackground.has(identity)){
+    const gradient=ctx.createLinearGradient(0,0,0,h);
+    backgrounds[identity].forEach(([position,color])=>gradient.addColorStop(position,'rgb('+color.join(',')+')'));
+    cachedBackground.set(identity,gradient);
+  }
+  ctx.fillStyle=cachedBackground.get(identity);ctx.fillRect(0,0,w,h);
+}
+function renderBackground(now){
+  if(backgroundTransition){
+    paintBackground(backgroundTransition.from);
+    ctx.globalAlpha=easeOut(Math.min(1,(now-backgroundTransition.at)/2000));paintBackground(backgroundIndex);ctx.globalAlpha=1;
+  }else paintBackground(backgroundIndex);
+}
 syncPageBackground();
 const all = Object.values(data.letters).flatMap(v => Object.values(v));
 const bounds = { x:Math.min(...all.map(v=>v.x)), y:Math.min(...all.map(v=>v.y)), right:Math.max(...all.map(v=>v.x+v.w)), bottom:Math.max(...all.map(v=>v.y+v.h)) };
@@ -139,8 +195,8 @@ function paintLetter(target,item,now){
   const cx=v.x+v.w/2+item.x/fit,cy=v.y+v.h/2+item.y/fit;
   target.translate(cx,cy);target.scale(pulse,pulse);target.translate(-cx,-cy);
   const alpha=target.globalAlpha;
-  if(old){target.globalAlpha=alpha*(1-t);target.drawImage(old.surface||old.img,old.x+item.x/fit,old.y+item.y/fit,old.w,old.h);}
-  target.globalAlpha=alpha*t;target.drawImage(item.surface||v.img,v.x+item.x/fit,v.y+item.y/fit,v.w,v.h);
+  if(old){target.globalAlpha=alpha*(1-t);target.drawImage(artwork(old.surface||old.img,old.w,old.h),old.x+item.x/fit,old.y+item.y/fit,old.w,old.h);}
+  target.globalAlpha=alpha*t;target.drawImage(artwork(item.surface||v.img,v.w,v.h),v.x+item.x/fit,v.y+item.y/fit,v.w,v.h);
   target.globalAlpha=alpha;target.restore();
 }
 
@@ -216,6 +272,12 @@ function draw(now) {
   advanceWave(now);
   scrollShift=window.SiteEffects.scrollOffset(now,reduce.matches);
   const elapsed=now-start;
+  advanceBackground(now);
+  const flashTime=elapsed%60000;
+  const flashing=elapsed>=60000&&flashTime<100;
+  if(flashing!==flashActive){flashActive=flashing;document.body.classList.toggle('flash-active',flashActive);}
+  const flashOpacity=flashActive?(flashTime<50?1:.69):0;
+  if(flashOpacity!==lastFlashOpacity){document.documentElement.style.setProperty('--flash-opacity',String(flashOpacity));lastFlashOpacity=flashOpacity;}
   const turn=progress(elapsed,550,cameraEnd-550);
   const ease=turn*turn*(3-2*turn);
   const iconEase=easeOut(progress(elapsed,cameraEnd,timeline.icons));
@@ -246,14 +308,8 @@ function draw(now) {
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
-  if(backgroundOrder[backgroundIndex]===6)paintNoisyBackground();
-  else {
-    if(!cachedBackground){
-      cachedBackground=ctx.createLinearGradient(0,0,0,h);
-      backgrounds[backgroundOrder[backgroundIndex]].forEach(([position,color])=>cachedBackground.addColorStop(position,'rgb('+color.join(',')+')'));
-    }
-    ctx.fillStyle=cachedBackground;ctx.fillRect(0,0,w,h);
-  }
+  renderBackground(now);
+  if(flashActive){ctx.fillStyle=`rgba(255,255,255,${flashOpacity})`;ctx.fillRect(0,0,w,h);}
   if(iconEase!==lastIconEase){
     nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
     nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);lastIconEase=iconEase;
@@ -271,7 +327,7 @@ function draw(now) {
     if(focused===item){ctx.strokeStyle='#999';ctx.lineWidth=1/fit;ctx.strokeRect(v.x,v.y,v.w,v.h);}
   }
   ctx.restore();
-  {
+  if(!flashActive){
     // Mirror the live artwork, including the current gradient surfaces and drift.
     const height=(bounds.bottom-bounds.y)*fit;
     const reflectionTop=h-height;

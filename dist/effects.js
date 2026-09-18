@@ -6,7 +6,7 @@ window.SiteEffects=(()=>{
   const dots=colors.map((color,index)=>{
     const big=index===colors.length-1;
     const dot=document.createElement('div');dot.className='floating-dot'+(big?' floating-dot-large':'');dot.setAttribute('aria-hidden','true');dot.style.background=color;dot.style.left=dot.style.top='0';document.body.append(dot);
-    return {dot,big,color,px:0,py:0,x:Math.random(),y:Math.random(),pulseAt:0,from:Math.random(),to:Math.random(),duration:1700+Math.random()*600,
+    return {dot,big,color,lifeAt:null,exitAt:null,respawnAt:null,px:0,py:0,x:Math.random(),y:Math.random(),pulseAt:0,from:Math.random(),to:Math.random(),duration:1700+Math.random()*600,
       phases:Array.from({length:6},()=>Math.random()*Math.PI*2),speeds:Array.from({length:6},()=>.035+Math.random()*.055)};
   });
   const smooth=t=>t*t*(3-2*t);
@@ -14,14 +14,37 @@ window.SiteEffects=(()=>{
   let colorFrom=[255,255,255],colorTo=[255,255,255],colorNow=[255,255,255],colorAt=0,colorTarget='#FFFFFF';
   function showDot(letter){if(letter||!suppressed){target=1;suppressed=false;}}
   function hideDot(){target=0;suppressed=true;}
+  function respawn(d,now){
+    d.x=Math.random();d.y=Math.random();d.lifeAt=now;d.exitAt=d.respawnAt=null;
+    d.phases=d.phases.map(()=>Math.random()*Math.PI*2);
+    d.speeds=d.speeds.map(()=>.035+Math.random()*.055);
+    d.from=Math.random();d.to=Math.random();d.pulseAt=now;
+    if(d.big){
+      const choices=colors.filter(color=>color!==colorTarget);
+      colorTarget=choices[Math.floor(Math.random()*choices.length)];
+      colorFrom=rgb(colorTarget);colorTo=[...colorFrom];colorNow=[...colorFrom];colorAt=now;
+      d.color=colorTarget;d.dot.style.background=colorTarget;
+    }
+  }
   function drawDot(now,w,h,reduced){
     const dt=last===null?0:Math.min(100,now-last);last=now;
     if(!target&&!opacity)return;
     if(birth===null&&target)birth=now;
     opacity+=Math.sign(target-opacity)*Math.min(Math.abs(target-opacity),dt/800);
     for(const d of dots){
-      const {dot,phases,speeds}=d;dot.style.opacity=opacity*(d.big?.62:1);
+      const {dot}=d;
+      if(d.lifeAt===null)d.lifeAt=now;
+      if(d.respawnAt!==null){
+        dot.style.opacity=0;
+        if(now<d.respawnAt)continue;
+        respawn(d,now);
+      }
+      const life=smooth(Math.min(1,(now-d.lifeAt)/800));
+      const exit=d.exitAt===null?1:1-smooth(Math.min(1,(now-d.exitAt)/800));
+      dot.style.opacity=opacity*life*exit*(d.big?.62:1);
       if(!opacity||birth===null)continue;
+      if(d.exitAt!==null&&now-d.exitAt>=800){d.respawnAt=now+250+Math.random()*950;continue;}
+      const {phases,speeds}=d;
       const t=(now-birth)/1000;
       // Smooth wandering velocity, with stronger upward/rightward components.
       const vx=10*Math.sin(t*speeds[0]+phases[0])+5*Math.sin(t*speeds[1]+phases[1]);
@@ -29,14 +52,13 @@ window.SiteEffects=(()=>{
       if(!reduced){
         d.x+=(vx>0?vx*(1+1.62):vx)*dt/1000/w*(d.big?8:1);
         d.y+=(vy<0?vy*(1+2.62):vy)*dt/1000/h*(d.big?8:1);
-        // Re-enter inside the opposite edge in the same frame, preserving color/count.
-        if(d.x<0)d.x=.99;else if(d.x>1)d.x=.01;
-        if(d.y<0)d.y=.99;else if(d.y>1)d.y=.01;
+        // Begin fading only after the center crosses the actual viewport edge.
+        if(d.exitAt===null&&(d.x<0||d.x>1||d.y<0||d.y>1))d.exitAt=now;
       }
       if(now-d.pulseAt>=d.duration){d.from=d.to;d.to=Math.random();d.pulseAt=now;d.duration=1700+Math.random()*600;}
       const pulse=reduced?.4:d.from+(d.to-d.from)*smooth(Math.min(1,(now-d.pulseAt)/d.duration));
       dot.style.width=dot.style.height=((1+3*pulse)*(d.big?8:1))+'px';dot.style.setProperty('--dot-blur',(2*pulse*(d.big?16:1))+'px');
-      d.px=12+Math.max(0,w-24)*d.x;d.py=12+Math.max(0,h-24)*d.y;
+      d.px=w*d.x;d.py=h*d.y;
       dot.style.transform=`translate3d(${d.px}px,${d.py}px,0) translate(-50%,-50%)`;
     }
     const large=dots[dots.length-1];
@@ -45,6 +67,7 @@ window.SiteEffects=(()=>{
     let nearest=null,distance=64*64;
     for(let index=0;index<dots.length-1;index++){
       const d=dots[index];
+      if(d.respawnAt!==null||d.exitAt!==null||large.respawnAt!==null||large.exitAt!==null)continue;
       const delta=(large.px-d.px)**2+(large.py-d.py)**2;
       if(delta<distance){distance=delta;nearest=d;}
     }
