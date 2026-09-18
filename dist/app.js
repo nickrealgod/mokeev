@@ -15,6 +15,7 @@ const reflection=document.createElement('canvas'), reflectionCtx=reflection.getC
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, lastWheel=0, wheelDelta=0, lastScrollFamily='black', scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
+const backgroundOrder=[0,6,5,2,1,3,4];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -44,12 +45,12 @@ function paintNoisyBackground(){
   ctx.drawImage(noisyBackground,0,0,w,h);
 }
 function syncPageBackground(){
-  document.body.classList.toggle("no-icon-glow",backgroundIndex>=3);
-  const stops=backgrounds[backgroundIndex];
+  document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
+  const stops=backgrounds[backgroundOrder[backgroundIndex]];
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
 }
-function changeBackground(){window.SiteEffects.hideDot();backgroundIndex=(backgroundIndex+1)%backgrounds.length;syncPageBackground();}
+function changeBackground(direction=1){window.SiteEffects.hideDot();backgroundIndex=(backgroundIndex+direction+backgrounds.length)%backgrounds.length;syncPageBackground();}
 syncPageBackground();
 const all = Object.values(data.letters).flatMap(v => Object.values(v));
 const bounds = { x:Math.min(...all.map(v=>v.x)), y:Math.min(...all.map(v=>v.y)), right:Math.max(...all.map(v=>v.x+v.w)), bottom:Math.max(...all.map(v=>v.y+v.h)) };
@@ -177,8 +178,8 @@ canvas.addEventListener('pointerup',e=>{
   if(!ready)return;
   const dx=e.clientX-g.x,dy=e.clientY-g.y;
   if(Math.hypot(dx,dy)>=24){if(g.type!=='mouse'){if(Math.abs(dy)>Math.abs(dx))window.SiteEffects.scrollImpulse(-dy);changeAll(gestureDirection(dx,dy));}}
-  else if(g.item){if(g.type!=='mouse')change(g.item);}
-  else changeBackground();
+  else if(g.item&&g.type!=='mouse')change(g.item);
+  else changeBackground(e.clientX<w/2?-1:1);
 });
 canvas.addEventListener('pointercancel',()=>gesture=null);
 canvas.addEventListener('lostpointercapture',()=>gesture=null);
@@ -244,9 +245,9 @@ function draw(now) {
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
   const background=ctx.createLinearGradient(0,0,0,h);
   const blend=rgb=>'rgb('+rgb.join(',')+')';
-  backgrounds[backgroundIndex].forEach(([position,color])=>background.addColorStop(position,blend(color)));
+  backgrounds[backgroundOrder[backgroundIndex]].forEach(([position,color])=>background.addColorStop(position,blend(color)));
   ctx.fillStyle=background;ctx.fillRect(0,0,w,h);
-  if(backgroundIndex===6)paintNoisyBackground();
+  if(backgroundOrder[backgroundIndex]===6)paintNoisyBackground();
   nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
   nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);
   document.body.style.setProperty('--arrow-opacity',String(arrowEase));

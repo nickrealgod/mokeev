@@ -27,7 +27,7 @@ console.log('PASS: 1,000 scroll palettes, exactly two bare letters, no adjacent 
 const source=fs.readFileSync(root+'/app.js','utf8');
 const handlers={};
 const gestureBlock=source.slice(source.indexOf('function gestureDirection('),source.indexOf("addEventListener('wheel'"));
-const touch={window:{SiteEffects:{scrollImpulse:()=>{}}},ready:true, canvas:{addEventListener:(type,fn)=>handlers[type]=fn,setPointerCapture:()=>{}}, hit:()=>null,changeAll:direction=>touch.directions.push(direction),changeBackground:()=>touch.backgrounds++,change:()=>touch.letters++,directions:[],backgrounds:0,letters:0,Math};
+const touch={w:1000,window:{SiteEffects:{scrollImpulse:()=>{}}},ready:true, canvas:{addEventListener:(type,fn)=>handlers[type]=fn,setPointerCapture:()=>{}}, hit:()=>null,changeAll:direction=>touch.directions.push(direction),changeBackground:()=>touch.backgrounds++,change:()=>touch.letters++,directions:[],backgrounds:0,letters:0,Math};
 vm.createContext(touch);vm.runInContext(gestureBlock,touch);
 const event=(x,y)=>({pointerId:1,pointerType:'touch',isPrimary:true,clientX:x,clientY:y});
 handlers.pointerdown(event(10,10));handlers.pointerup(event(10,10));assert.equal(touch.backgrounds,1);assert.equal(touch.directions.length,0);

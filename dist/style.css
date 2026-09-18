@@ -95,3 +95,5 @@ body.no-icon-glow nav a:is(:hover,:focus-visible,:active) .icon::before{opacity:
 /* Keep the color-bearing core crisp: blurring a 1–4px dot erased its saturation. */
 .floating-dot{filter:none}
 .floating-dot::before{content:"";position:absolute;inset:0;border-radius:inherit;background:inherit;filter:blur(var(--dot-blur,0px));pointer-events:none}
+
+.floating-dot-large{filter:blur(var(--dot-blur,0px))}.floating-dot-large::before{display:none}
