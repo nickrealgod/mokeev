@@ -1,21 +1,21 @@
 'use strict';
 const data = window.LETTERS;
-const { family, pick, nextGradient, options, commonFamilies, gradientSet } = window.Variations;
+const { pick, nextGradient, options, commonFamilies, gradientSet } = window.Variations;
 const canvas = document.querySelector('#stage'), ctx = canvas.getContext('2d');
 const nav = document.querySelector('nav'), reduce = matchMedia('(prefers-reduced-motion: reduce)');
 const order = ['M','O','K','E','€','V','*','C','Oo','M2'];
 const items = order.map(key => ({ key, style:'black', gradient:-1, surface:null, cycles:{}, variants:{}, x:0, y:0, from:[0,0], to:[0,0], driftAt:0 }));
 const easeOut = t => 1 - Math.pow(1-t,3);
 const progress = (elapsed, start, duration) => reduce.matches ? 1 : Math.max(0, Math.min(1,(elapsed-start)/duration));
-const timeline = { hold:750, camera:1500, icons:1500, arrows:0 };
+const timeline = { hold:750, camera:1500, icons:1500 };
 const cameraEnd = timeline.hold + timeline.camera;
 const iconsEnd = cameraEnd + timeline.icons;
-const introEnd = iconsEnd + timeline.arrows;
+const introEnd = iconsEnd;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
-let hover=null, focused=null, lastWheel=0, wheelDelta=0, lastScrollFamily='black', scrollCycleIndex=0;
+let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
-const backgroundOrder=[0,6,5,2,1,3,4];
+const backgroundOrder=[0,6,5,1,2,3,4];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -25,6 +25,7 @@ const backgrounds=[
   [[0,[228,231,235]],[1,[228,231,235]]],
   [[0,[192,192,196]],[1,[190,193,197]]]
 ];
+let cachedBackground=null, reflectionFade=null, lastIconEase=-1;
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -50,7 +51,7 @@ function syncPageBackground(){
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
 }
-function changeBackground(direction=1){window.SiteEffects.hideDot();backgroundIndex=(backgroundIndex+direction+backgrounds.length)%backgrounds.length;syncPageBackground();}
+function changeBackground(direction=1){cachedBackground=null;window.SiteEffects.hideDot();backgroundIndex=(backgroundIndex+direction+backgrounds.length)%backgrounds.length;syncPageBackground();}
 syncPageBackground();
 const all = Object.values(data.letters).flatMap(v => Object.values(v));
 const bounds = { x:Math.min(...all.map(v=>v.x)), y:Math.min(...all.map(v=>v.y)), right:Math.max(...all.map(v=>v.x+v.w)), bottom:Math.max(...all.map(v=>v.y+v.h)) };
@@ -59,7 +60,7 @@ const baseline=Math.max(...order.slice(0,6).map(key=>data.letters[key].black.y+d
 const euro=data.letters['€'].black, focus=[euro.x+euro.w*.6,euro.y+euro.h/2];
 nav.inert = true;
 function resize() {
-  w=innerWidth; h=innerHeight;
+  w=innerWidth; h=innerHeight;cachedBackground=null;reflectionFade=null;
   // Preserve Retina detail while keeping the canvas within mobile memory limits.
   const dpr=Math.min(devicePixelRatio||1, Math.sqrt(16777216/(w*h)), 8192/w, 8192/h);
   canvas.width=Math.round(w*dpr); canvas.height=Math.round(h*dpr);
@@ -117,7 +118,6 @@ function changeAll(direction='ltr') {
     if(reduce.matches){apply(item,style,gradients[index]);return;}
     item.pending={style,gradient:gradients[index],at:now+(direction==='rtl'?items.length-1-index:index)*25};
   });
-  lastScrollFamily=group;
   waveUntil=reduce.matches?now:now+(items.length-1)*25+200;
 }
 function advanceWave(now){
@@ -151,7 +151,8 @@ function maskHit(v,x,y) {
 function hit(x,y) {
   if (!ready) return null;
   const px=(x-w/2)/fit+center[0],py=(y-letteringY-scrollShift)/fit+center[1];
-  for (const item of [...items].reverse()) {
+  for (let index=items.length-1;index>=0;index--) {
+    const item=items[index];
     const v=item.variants[item.style],ix=Math.floor(px-v.x-item.x/fit),iy=Math.floor(py-v.y-item.y/fit);
     if (ix>=0&&iy>=0&&ix<v.w&&iy<v.h&&maskHit(v,ix,iy)) return item;
   }
@@ -200,7 +201,7 @@ addEventListener('wheel',e=>{
   if(now<waveUntil){wheelConsumed=true;wheelDelta=0;return;}
   if(wheelConsumed)return;
   wheelDelta+=magnitude;
-  if(wheelDelta>=24){changeAll(direction);lastWheel=now;wheelDelta=0;wheelConsumed=true;}
+  if(wheelDelta>=24){changeAll(direction);wheelDelta=0;wheelConsumed=true;}
 
 },{passive:false});
 items.forEach(item=>{
@@ -218,39 +219,45 @@ function draw(now) {
   const turn=progress(elapsed,550,cameraEnd-550);
   const ease=turn*turn*(3-2*turn);
   const iconEase=easeOut(progress(elapsed,cameraEnd,timeline.icons));
-  const arrowEase=easeOut(progress(elapsed,iconsEnd,timeline.arrows));
   if((reduce.matches||elapsed>=introEnd)&&!ready){
     ready=true;nav.inert=false;document.body.classList.add('ready');
     document.querySelectorAll('#keyboard button').forEach(b=>b.disabled=false);
   }
-  // Start at half the previous magnification. Snap to native or 2x source
-  // density only when that stays within 20% of the requested framing.
-  const desiredZoom=h/euro.w;
-  const sourceWidth=items.find(item=>item.key==='€').variants.black.img.naturalWidth;
-  const renderRatio=desiredZoom*euro.w*(canvas.width/w)/sourceWidth;
-  const density=[.5,1].reduce((a,b)=>Math.abs(b-renderRatio)<Math.abs(a-renderRatio)?b:a);
-  const initialZoom=Math.abs(density/renderRatio-1)<=.2?desiredZoom*density/renderRatio:desiredZoom;
-  // Cubic Hermite segments share position and velocity at 750 ms.
-  const startZoom=2*initialZoom,midZoom=startZoom*.62;
-  const joinSpeed=-(midZoom-fit)/timeline.camera;
-  const hermite=(a,b,va,vb,t,d)=>{
-    const t2=t*t,t3=t2*t;
-    return (2*t3-3*t2+1)*a+(t3-2*t2+t)*d*va+(-2*t3+3*t2)*b+(t3-t2)*d*vb;
-  };
-  const zoom=reduce.matches?fit:elapsed<timeline.hold
-    ?hermite(startZoom,midZoom,-(startZoom-midZoom)/timeline.hold,joinSpeed,progress(elapsed,0,timeline.hold),timeline.hold)
-    :hermite(midZoom,fit,joinSpeed,0,progress(elapsed,timeline.hold,timeline.camera),timeline.camera);
+  let zoom=fit;
+  if(!reduce.matches&&elapsed<cameraEnd){
+    // Start at half the previous magnification. Snap to native or 2x source
+    // density only when that stays within 20% of the requested framing.
+    const desiredZoom=h/euro.w;
+    const sourceWidth=items.find(item=>item.key==='€').variants.black.img.naturalWidth;
+    const renderRatio=desiredZoom*euro.w*(canvas.width/w)/sourceWidth;
+    const density=[.5,1].reduce((a,b)=>Math.abs(b-renderRatio)<Math.abs(a-renderRatio)?b:a);
+    const initialZoom=Math.abs(density/renderRatio-1)<=.2?desiredZoom*density/renderRatio:desiredZoom;
+    // Cubic Hermite segments share position and velocity at 750 ms.
+    const startZoom=2*initialZoom,midZoom=startZoom*.62;
+    const joinSpeed=-(midZoom-fit)/timeline.camera;
+    const hermite=(a,b,va,vb,t,d)=>{
+      const t2=t*t,t3=t2*t;
+      return (2*t3-3*t2+1)*a+(t3-2*t2+t)*d*va+(-2*t3+3*t2)*b+(t3-t2)*d*vb;
+    };
+    zoom=elapsed<timeline.hold
+      ?hermite(startZoom,midZoom,-(startZoom-midZoom)/timeline.hold,joinSpeed,progress(elapsed,0,timeline.hold),timeline.hold)
+      :hermite(midZoom,fit,joinSpeed,0,progress(elapsed,timeline.hold,timeline.camera),timeline.camera);
+  }
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
-  const background=ctx.createLinearGradient(0,0,0,h);
-  const blend=rgb=>'rgb('+rgb.join(',')+')';
-  backgrounds[backgroundOrder[backgroundIndex]].forEach(([position,color])=>background.addColorStop(position,blend(color)));
-  ctx.fillStyle=background;ctx.fillRect(0,0,w,h);
   if(backgroundOrder[backgroundIndex]===6)paintNoisyBackground();
-  nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
-  nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);
-  document.body.style.setProperty('--arrow-opacity',String(arrowEase));
+  else {
+    if(!cachedBackground){
+      cachedBackground=ctx.createLinearGradient(0,0,0,h);
+      backgrounds[backgroundOrder[backgroundIndex]].forEach(([position,color])=>cachedBackground.addColorStop(position,'rgb('+color.join(',')+')'));
+    }
+    ctx.fillStyle=cachedBackground;ctx.fillRect(0,0,w,h);
+  }
+  if(iconEase!==lastIconEase){
+    nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
+    nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);lastIconEase=iconEase;
+  }
   ctx.translate(w/2,h*.5*(1-ease)+letteringY*ease);ctx.rotate(angle);ctx.scale(zoom,zoom);ctx.translate(-cx,-cy);
   ctx.save();ctx.translate(0,scrollShift/fit);
   for(const item of items){
@@ -270,15 +277,17 @@ function draw(now) {
     const reflectionTop=h-height;
     const dpr=canvas.width/w;
     const rw=canvas.width,rh=Math.ceil((height+6)*dpr);
-    if(reflection.width!==rw||reflection.height!==rh){reflection.width=rw;reflection.height=rh;}
+    if(reflection.width!==rw||reflection.height!==rh){reflection.width=rw;reflection.height=rh;reflectionFade=null;}
     const rc=reflectionCtx;
     rc.setTransform(dpr,0,0,dpr,0,0);rc.clearRect(0,0,w,height+6);
     rc.save();rc.translate(w/2,3);rc.scale(fit,-fit);rc.translate(-center[0],-bounds.bottom);
     for(const item of items)paintLetter(rc,item,now);
     rc.restore();
-    const fade=rc.createLinearGradient(0,3,0,height+3);
-    fade.addColorStop(0,'rgba(0,0,0,0.09)');fade.addColorStop(1,'rgba(0,0,0,0)');
-    rc.globalCompositeOperation='destination-in';rc.fillStyle=fade;rc.fillRect(0,0,w,height+6);rc.globalCompositeOperation='source-over';
+    if(!reflectionFade){
+      reflectionFade=rc.createLinearGradient(0,3,0,height+3);
+      reflectionFade.addColorStop(0,'rgba(0,0,0,0.09)');reflectionFade.addColorStop(1,'rgba(0,0,0,0)');
+    }
+    rc.globalCompositeOperation='destination-in';rc.fillStyle=reflectionFade;rc.fillRect(0,0,w,height+6);rc.globalCompositeOperation='source-over';
     // Reflection is part of the same world: camera rotation and zoom apply to both.
     ctx.drawImage(reflection,center[0]-w/(2*fit),center[1]+(reflectionTop-3-letteringY-scrollShift)/fit,w/fit,(height+6)/fit);
   }
