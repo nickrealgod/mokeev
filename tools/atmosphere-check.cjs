@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const root=path.resolve(__dirname,'../dist');
 const nodes=[],classes=new Set();
 let seed=71823;const seededMath=Object.create(Math);seededMath.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
-const context2d=()=>new Proxy({globalAlpha:1,createLinearGradient:()=>({addColorStop(){}}),createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)})},{get:(o,k)=>k in o?o[k]:()=>{}});
+const context2d=()=>new Proxy({globalAlpha:1,createLinearGradient:()=>({addColorStop(){}}),getImageData:(x,y,w,h)=>({data:new Uint8ClampedArray(w*h*4)}),createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)})},{get:(o,k)=>k in o?o[k]:()=>{}});
 function node(){const n={width:0,height:0,style:{setProperty(k,v){this[k]=v;}},classList:{add:k=>classes.add(k),toggle(k,on){if(on)classes.add(k);else classes.delete(k);}},setAttribute(){},getAttribute:()=>'',append(){},addEventListener(){},querySelectorAll:()=>[],getContext:()=>context2d()};nodes.push(n);return n;}
 const stage=node(),nav=node(),body=node(),html=node(),theme=node(),keyboard=node(),error=node();
 const selectors={'#stage':stage,nav,'#keyboard':keyboard,'#error':error,'meta[name="theme-color"]':theme};
@@ -21,9 +21,9 @@ const run=s=>vm.runInContext(s,sandbox);
   run('changeBackground(-1);draw(45016)');assert.equal(run('backgroundIndex'),5);assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/center bottom \/ cover/);
   run('draw(60000);draw(60050);draw(60100)');assert(!classes.has('flash-active'));
   assert.equal(run('timeline.hold'),1500);assert.equal(run('cameraEnd'),4500);assert.equal(run('introEnd'),7500);
-  assert(!html.style['--page-background'].includes('gradient'));
+  assert(html.style['--page-background'].includes('rgba(255,255,255,.69)'));
   assert.equal(run('items[0].variants.black.img===items[9].variants.black.img'),true);
-  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, sixth background: unmodified bokeh with bottom-center cover, no flash, shared images.');
+  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, sixth background: bokeh with 69% white, cached 3% noise and bottom-center cover, no flash, shared images.');
   const dots=nodes.filter(n=>n.className?.startsWith('floating-dot'));assert.equal(dots.length,19);
   const e=sandbox.window.SiteEffects;e.showDot(true);
   let previous=[],respawns=0,sawOutside=false,largeColors=new Set();

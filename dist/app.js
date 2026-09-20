@@ -54,7 +54,7 @@ function paintNoisyBackground(){
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
   if(backgroundOrder[backgroundIndex]===7){
-    document.documentElement.style.setProperty('--page-background','url("assets/silver-bokeh.webp") center bottom / cover no-repeat #fff');
+    document.documentElement.style.setProperty('--page-background','linear-gradient(rgba(255,255,255,.69),rgba(255,255,255,.69)),url("assets/silver-bokeh.webp") center bottom / cover no-repeat #fff');
     document.querySelector('meta[name="theme-color"]').content='#fafafa';return;
   }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
@@ -85,6 +85,14 @@ function paintBackground(index){
         const scale=Math.max(photoBackground.width/backgroundImage.naturalWidth,photoBackground.height/backgroundImage.naturalHeight);
         const width=backgroundImage.naturalWidth*scale,height=backgroundImage.naturalHeight*scale;
         paint.drawImage(backgroundImage,(photoBackground.width-width)/2,photoBackground.height-height,width,height);
+        paint.fillStyle='rgba(255,255,255,.69)';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
+        // Static monochrome uniform noise, ±3% of the 8-bit range; generated only on load/resize.
+        const pixels=paint.getImageData(0,0,photoBackground.width,photoBackground.height);
+        for(let i=0;i<pixels.data.length;i+=4){
+          const noise=(Math.random()*2-1)*255*.03;
+          for(let channel=0;channel<3;channel++)pixels.data[i+channel]=Math.round(pixels.data[i+channel]+noise);
+        }
+        paint.putImageData(pixels,0,0);
       }
       photoBackgroundDirty=false;
     }
