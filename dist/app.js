@@ -7,7 +7,7 @@ const order = ['M','O','K','E','€','V','*','C','Oo','M2'];
 const items = order.map(key => ({ key, style:'black', gradient:-1, surface:null, cycles:{}, variants:{}, x:0, y:0, from:[0,0], to:[0,0], driftAt:0 }));
 const easeOut = t => 1 - Math.pow(1-t,3);
 const progress = (elapsed, start, duration) => reduce.matches ? 1 : Math.max(0, Math.min(1,(elapsed-start)/duration));
-const timeline = { hold:750, camera:1500, icons:1500 };
+const timeline = { hold:1500, camera:3000, icons:3000 };
 const cameraEnd = timeline.hold + timeline.camera;
 const iconsEnd = cameraEnd + timeline.icons;
 const introEnd = iconsEnd;
@@ -25,22 +25,13 @@ const backgrounds=[
   [[0,[228,231,235]],[1,[228,231,235]]],
   [[0,[192,192,196]],[1,[190,193,197]]]
 ];
-let cachedBackground=null, reflectionFade=null, lastIconEase=-1;
-let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true,flashActive=false,lastFlashOpacity=0;
-const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/background.jpg';
+let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=true;
+let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
+const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/silver-bokeh.webp';
 let backgroundImageReady=false;
-backgroundImage.decode().then(()=>{backgroundImageReady=true;}).catch(error=>console.warn('Background unavailable',error));
-const tintedArtwork=new WeakMap();
-function artwork(image,width,height){
-  if(!flashActive)return image;
-  if(!tintedArtwork.has(image)){
-    const tint=document.createElement('canvas');tint.width=width;tint.height=height;
-    const paint=tint.getContext('2d');paint.drawImage(image,0,0,width,height);paint.globalCompositeOperation='source-in';
-    paint.fillStyle='#E4E7EB';paint.fillRect(0,0,tint.width,tint.height);tintedArtwork.set(image,tint);
-  }
-  return tintedArtwork.get(image);
-}
-nav.querySelectorAll('.icon').forEach(icon=>icon.style.setProperty('--flash-logo',`url("${icon.querySelector('.state-idle').getAttribute('src')}")`));
+const photoBackground=document.createElement('canvas');
+let photoBackgroundDirty=true;
+backgroundImage.decode().then(()=>{backgroundImageReady=true;photoBackgroundDirty=true;}).catch(error=>console.warn('Background unavailable',error));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -63,8 +54,8 @@ function paintNoisyBackground(){
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
   if(backgroundOrder[backgroundIndex]===7){
-    document.documentElement.style.setProperty('--page-background','url("assets/background.jpg") center bottom / cover no-repeat #bec1c5');
-    document.querySelector('meta[name="theme-color"]').content='#bec1c5';return;
+    document.documentElement.style.setProperty('--page-background','linear-gradient(rgba(255,255,255,.93),rgba(255,255,255,.93)),url("assets/silver-bokeh.webp") center bottom / cover no-repeat #fff');
+    document.querySelector('meta[name="theme-color"]').content='#fafafa';return;
   }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
@@ -75,11 +66,11 @@ function changeBackground(direction=1){
   backgroundIndex=(backgroundIndex+direction+backgroundOrder.length)%backgroundOrder.length;syncPageBackground();
 }
 function advanceBackground(now){
-  if(nextAutoBackground===null)nextAutoBackground=now+15000;
+  if(nextAutoBackground===null)nextAutoBackground=now+10000;
   if(autoBackground&&now>=nextAutoBackground){
     const next=firstAutoBackground?4:(backgroundIndex+1)%backgroundOrder.length;
     backgroundTransition={from:backgroundIndex,at:now};backgroundIndex=next;
-    firstAutoBackground=false;nextAutoBackground=now+15000;window.SiteEffects.hideDot();syncPageBackground();
+    firstAutoBackground=false;nextAutoBackground=now+10000;window.SiteEffects.hideDot();syncPageBackground();
   }
   if(backgroundTransition&&now-backgroundTransition.at>=2000)backgroundTransition=null;
 }
@@ -87,12 +78,18 @@ function paintBackground(index){
   const identity=backgroundOrder[index];
   if(identity===6){paintNoisyBackground();return;}
   if(identity===7){
-    if(backgroundImageReady){
-      const scale=Math.max(w/backgroundImage.naturalWidth,h/backgroundImage.naturalHeight);
-      const width=backgroundImage.naturalWidth*scale,height=backgroundImage.naturalHeight*scale;
-      ctx.drawImage(backgroundImage,(w-width)/2,h-height,width,height);
-    }else {ctx.fillStyle='#bec1c5';ctx.fillRect(0,0,w,h);}
-    return;
+    if(photoBackgroundDirty){
+      photoBackground.width=canvas.width;photoBackground.height=canvas.height;
+      const paint=photoBackground.getContext('2d');paint.fillStyle='#fff';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
+      if(backgroundImageReady){
+        const scale=Math.max(photoBackground.width/backgroundImage.naturalWidth,photoBackground.height/backgroundImage.naturalHeight);
+        const width=backgroundImage.naturalWidth*scale,height=backgroundImage.naturalHeight*scale;
+        paint.drawImage(backgroundImage,(photoBackground.width-width)/2,photoBackground.height-height,width,height);
+        paint.fillStyle='rgba(255,255,255,.93)';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
+      }
+      photoBackgroundDirty=false;
+    }
+    ctx.drawImage(photoBackground,0,0,w,h);return;
   }
   if(!cachedBackground)cachedBackground=new Map();
   if(!cachedBackground.has(identity)){
@@ -116,7 +113,7 @@ const baseline=Math.max(...order.slice(0,6).map(key=>data.letters[key].black.y+d
 const euro=data.letters['€'].black, focus=[euro.x+euro.w*.6,euro.y+euro.h/2];
 nav.inert = true;
 function resize() {
-  w=innerWidth; h=innerHeight;cachedBackground=null;reflectionFade=null;
+  w=innerWidth; h=innerHeight;cachedBackground=null;reflectionFade=null;reflectionDirty=true;photoBackgroundDirty=true;
   // Preserve Retina detail while keeping the canvas within mobile memory limits.
   const dpr=Math.min(devicePixelRatio||1, Math.sqrt(16777216/(w*h)), 8192/w, 8192/h);
   canvas.width=Math.round(w*dpr); canvas.height=Math.round(h*dpr);
@@ -127,15 +124,21 @@ function resize() {
   document.body.style.setProperty('--links-top',`${linksTop}px`);
 }
 addEventListener('resize', resize); resize();
+// Share decoded images and hit masks when multiple letters use the same asset.
+const imageCache=new Map(),maskCache=new Map();
 async function load(item, style) {
-  const info=data.letters[item.key][style], img=new Image();
-  img.decoding='async';
-  img.src=item.key==='€' && style==='black' ? 'assets/letters/black/euro-original.png' : info.src;
-  await img.decode();
-  item.variants[style]={...info,img,alpha:Uint8Array.from(atob(info.mask),c=>c.charCodeAt(0))};
+  const info=data.letters[item.key][style];
+  const src=item.key==='€' && style==='black' ? 'assets/letters/black/euro-original.png' : info.src;
+  if(!imageCache.has(src)){
+    const img=new Image();img.decoding='async';img.src=src;
+    imageCache.set(src,img.decode().then(()=>img).catch(error=>{imageCache.delete(src);throw error;}));
+  }
+  const img=await imageCache.get(src);
+  if(!maskCache.has(info.mask))maskCache.set(info.mask,Uint8Array.from(atob(info.mask),c=>c.charCodeAt(0)));
+  item.variants[style]={...info,img,alpha:maskCache.get(info.mask)};
 }
 function apply(item, style, gradient) {
-  item.style=style; item.gradient=gradient; item.surface=null;
+  item.style=style; item.gradient=gradient; item.surface=null;reflectionDirty=true;
   if (gradient < 0) return;
   const v=item.variants[style], g=window.GRADIENTS[gradient];
   const surface=document.createElement('canvas'); surface.width=v.w; surface.height=v.h;
@@ -195,8 +198,8 @@ function paintLetter(target,item,now){
   const cx=v.x+v.w/2+item.x/fit,cy=v.y+v.h/2+item.y/fit;
   target.translate(cx,cy);target.scale(pulse,pulse);target.translate(-cx,-cy);
   const alpha=target.globalAlpha;
-  if(old){target.globalAlpha=alpha*(1-t);target.drawImage(artwork(old.surface||old.img,old.w,old.h),old.x+item.x/fit,old.y+item.y/fit,old.w,old.h);}
-  target.globalAlpha=alpha*t;target.drawImage(artwork(item.surface||v.img,v.w,v.h),v.x+item.x/fit,v.y+item.y/fit,v.w,v.h);
+  if(old){target.globalAlpha=alpha*(1-t);target.drawImage(old.surface||old.img,old.x+item.x/fit,old.y+item.y/fit,old.w,old.h);}
+  target.globalAlpha=alpha*t;target.drawImage(item.surface||v.img,v.x+item.x/fit,v.y+item.y/fit,v.w,v.h);
   target.globalAlpha=alpha;target.restore();
 }
 
@@ -215,7 +218,7 @@ function hit(x,y) {
   return null;
 }
 canvas.addEventListener('pointermove',e=>{
-  if(e.pointerType==='touch') return;
+  if(e.pointerType!=='mouse') return;
   const item=hit(e.clientX,e.clientY);
   if(item!==hover){hover=item;if(item)change(item);}
   canvas.style.cursor=item?'pointer':'default';
@@ -226,13 +229,31 @@ function wheelDirection(dx,dy){return Math.abs(dx)>Math.abs(dy)?(dx>0?'ltr':'rtl
 let gesture=null;
 canvas.addEventListener('pointerdown',e=>{
   if(!ready||!e.isPrimary||e.button>0)return;
-  gesture={id:e.pointerId,x:e.clientX,y:e.clientY,item:hit(e.clientX,e.clientY),type:e.pointerType};
+  gesture={id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,item:hit(e.clientX,e.clientY),type:e.pointerType,axis:null,brushing:false,lastItem:null};
   canvas.setPointerCapture(e.pointerId);
+});
+function traceTouch(g,x,y){
+  const dx=x-g.x,dy=y-g.y;
+  if(!g.axis&&Math.max(Math.abs(dx),Math.abs(dy))>=12)g.axis=Math.abs(dx)>=Math.abs(dy)?'horizontal':'vertical';
+  if(g.axis==='horizontal'){
+    // Sample the segment so a quick finger movement cannot skip narrow letters.
+    const steps=Math.max(1,Math.min(256,Math.ceil(Math.hypot(x-g.lastX,y-g.lastY)/6)));
+    for(let i=0;i<=steps;i++){
+      const item=hit(g.lastX+(x-g.lastX)*i/steps,g.lastY+(y-g.lastY)*i/steps);
+      if(item){g.brushing=true;if(item!==g.lastItem)change(item);g.lastItem=item;}
+    }
+  }
+  if(g.axis){g.lastX=x;g.lastY=y;}
+}
+canvas.addEventListener('pointermove',e=>{
+  if(!gesture||gesture.id!==e.pointerId||gesture.type==='mouse'||!ready)return;
+  traceTouch(gesture,e.clientX,e.clientY);
 });
 canvas.addEventListener('pointerup',e=>{
   if(!gesture||gesture.id!==e.pointerId)return;
   const g=gesture;gesture=null;
   if(!ready)return;
+  if(g.type!=='mouse'){traceTouch(g,e.clientX,e.clientY);if(g.brushing)return;}
   const dx=e.clientX-g.x,dy=e.clientY-g.y;
   if(Math.hypot(dx,dy)>=24){if(g.type!=='mouse'){if(Math.abs(dy)>Math.abs(dx))window.SiteEffects.scrollImpulse(-dy);changeAll(gestureDirection(dx,dy));}}
   else if(g.item&&g.type!=='mouse')change(g.item);
@@ -273,12 +294,7 @@ function draw(now) {
   scrollShift=window.SiteEffects.scrollOffset(now,reduce.matches);
   const elapsed=now-start;
   advanceBackground(now);
-  const flashTime=elapsed%60000;
-  const flashing=elapsed>=60000&&flashTime<100;
-  if(flashing!==flashActive){flashActive=flashing;document.body.classList.toggle('flash-active',flashActive);}
-  const flashOpacity=flashActive?(flashTime<50?1:.69):0;
-  if(flashOpacity!==lastFlashOpacity){document.documentElement.style.setProperty('--flash-opacity',String(flashOpacity));lastFlashOpacity=flashOpacity;}
-  const turn=progress(elapsed,550,cameraEnd-550);
+  const turn=progress(elapsed,1100,cameraEnd-1100);
   const ease=turn*turn*(3-2*turn);
   const iconEase=easeOut(progress(elapsed,cameraEnd,timeline.icons));
   if((reduce.matches||elapsed>=introEnd)&&!ready){
@@ -294,7 +310,7 @@ function draw(now) {
     const renderRatio=desiredZoom*euro.w*(canvas.width/w)/sourceWidth;
     const density=[.5,1].reduce((a,b)=>Math.abs(b-renderRatio)<Math.abs(a-renderRatio)?b:a);
     const initialZoom=Math.abs(density/renderRatio-1)<=.2?desiredZoom*density/renderRatio:desiredZoom;
-    // Cubic Hermite segments share position and velocity at 750 ms.
+    // Cubic Hermite segments share position and velocity at 1500 ms.
     const startZoom=2*initialZoom,midZoom=startZoom*.62;
     const joinSpeed=-(midZoom-fit)/timeline.camera;
     const hermite=(a,b,va,vb,t,d)=>{
@@ -309,7 +325,6 @@ function draw(now) {
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
   renderBackground(now);
-  if(flashActive){ctx.fillStyle=`rgba(255,255,255,${flashOpacity})`;ctx.fillRect(0,0,w,h);}
   if(iconEase!==lastIconEase){
     nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
     nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);lastIconEase=iconEase;
@@ -327,23 +342,26 @@ function draw(now) {
     if(focused===item){ctx.strokeStyle='#999';ctx.lineWidth=1/fit;ctx.strokeRect(v.x,v.y,v.w,v.h);}
   }
   ctx.restore();
-  if(!flashActive){
+  {
     // Mirror the live artwork, including the current gradient surfaces and drift.
     const height=(bounds.bottom-bounds.y)*fit;
     const reflectionTop=h-height;
     const dpr=canvas.width/w;
     const rw=canvas.width,rh=Math.ceil((height+6)*dpr);
-    if(reflection.width!==rw||reflection.height!==rh){reflection.width=rw;reflection.height=rh;reflectionFade=null;}
-    const rc=reflectionCtx;
-    rc.setTransform(dpr,0,0,dpr,0,0);rc.clearRect(0,0,w,height+6);
-    rc.save();rc.translate(w/2,3);rc.scale(fit,-fit);rc.translate(-center[0],-bounds.bottom);
-    for(const item of items)paintLetter(rc,item,now);
-    rc.restore();
-    if(!reflectionFade){
-      reflectionFade=rc.createLinearGradient(0,3,0,height+3);
-      reflectionFade.addColorStop(0,'rgba(0,0,0,0.09)');reflectionFade.addColorStop(1,'rgba(0,0,0,0)');
+    if(reflection.width!==rw||reflection.height!==rh){reflection.width=rw;reflection.height=rh;reflectionFade=null;reflectionDirty=true;}
+    if(reflectionDirty||(ready&&!reduce.matches)){
+      const rc=reflectionCtx;
+      rc.setTransform(dpr,0,0,dpr,0,0);rc.clearRect(0,0,w,height+6);
+      rc.save();rc.translate(w/2,3);rc.scale(fit,-fit);rc.translate(-center[0],-bounds.bottom);
+      for(const item of items)paintLetter(rc,item,now);
+      rc.restore();
+      if(!reflectionFade){
+        reflectionFade=rc.createLinearGradient(0,3,0,height+3);
+        reflectionFade.addColorStop(0,'rgba(0,0,0,0.09)');reflectionFade.addColorStop(1,'rgba(0,0,0,0)');
+      }
+      rc.globalCompositeOperation='destination-in';rc.fillStyle=reflectionFade;rc.fillRect(0,0,w,height+6);rc.globalCompositeOperation='source-over';
+      reflectionDirty=false;
     }
-    rc.globalCompositeOperation='destination-in';rc.fillStyle=reflectionFade;rc.fillRect(0,0,w,height+6);rc.globalCompositeOperation='source-over';
     // Reflection is part of the same world: camera rotation and zoom apply to both.
     ctx.drawImage(reflection,center[0]-w/(2*fit),center[1]+(reflectionTop-3-letteringY-scrollShift)/fit,w/fit,(height+6)/fit);
   }

@@ -11,18 +11,19 @@ vm.createContext(sandbox);for(const file of ['letters','gradients','variations',
 const run=s=>vm.runInContext(s,sandbox);
 (async()=>{
   await new Promise(resolve=>setImmediate(resolve));
-  run('draw(0);draw(14999)');assert.equal(run('backgroundIndex'),0);
-  run('draw(15000)');assert.equal(run('backgroundIndex'),4);assert(run('backgroundTransition!==null'));
-  run('draw(16000)');assert(run('backgroundTransition!==null'));
-  run('draw(17000)');assert.equal(run('backgroundTransition'),null);
-  run('draw(30000)');assert.equal(run('backgroundIndex'),5);
+  run('draw(0);draw(9999)');assert.equal(run('backgroundIndex'),0);
+  run('draw(10000)');assert.equal(run('backgroundIndex'),4);assert(run('backgroundTransition!==null'));
+  run('draw(11000)');assert(run('backgroundTransition!==null'));
+  run('draw(12000)');assert.equal(run('backgroundTransition'),null);
+  run('draw(20000)');assert.equal(run('backgroundIndex'),5);
   run('changeBackground(1)');assert.equal(run('autoBackground'),false);assert.equal(run('backgroundIndex'),6);
   run('draw(45000)');assert.equal(run('backgroundIndex'),6);
   run('changeBackground(1);draw(45016)');assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/center bottom \/ cover/);
-  run('draw(60000)');assert(classes.has('flash-active'));assert.equal(html.style['--flash-opacity'],'1');
-  run('draw(60050)');assert.equal(html.style['--flash-opacity'],'0.69');
-  run('draw(60100)');assert(!classes.has('flash-active'));assert.equal(html.style['--flash-opacity'],'0');
-  console.log('PASS: automatic fifth background at 15s, 2s transition, subsequent cycle, manual cancellation, image cover, 50ms + 50ms flash.');
+  run('draw(60000);draw(60050);draw(60100)');assert(!classes.has('flash-active'));
+  assert.equal(run('timeline.hold'),1500);assert.equal(run('cameraEnd'),4500);assert.equal(run('introEnd'),7500);
+  assert.match(html.style['--page-background'],/rgba\(255,255,255,.93\)/);
+  assert.equal(run('items[0].variants.black.img===items[9].variants.black.img'),true);
+  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, bokeh cover with 93% white, no flash, shared images.');
   const dots=nodes.filter(n=>n.className?.startsWith('floating-dot'));assert.equal(dots.length,19);
   const e=sandbox.window.SiteEffects;e.showDot(true);
   let previous=[],respawns=0,sawOutside=false,largeColors=new Set();

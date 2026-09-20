@@ -97,10 +97,3 @@ body.no-icon-glow nav a:is(:hover,:focus-visible,:active) .icon::before{opacity:
 .floating-dot::before{content:"";position:absolute;inset:0;border-radius:inherit;background:inherit;filter:blur(var(--dot-blur,0px));pointer-events:none}
 
 .floating-dot-large{filter:blur(var(--dot-blur,0px))}.floating-dot-large::before{display:none}
-
-/* The minute-long cycle flashes the backdrop while preserving logo silhouettes. */
-body.flash-active .floating-dot{visibility:hidden}
-body.flash-active nav .icon::before{opacity:0!important}
-body.flash-active nav .icon img{visibility:hidden!important}
-body.flash-active nav .icon::after{content:"";position:absolute;inset:-6.25%;background:#E4E7EB;mask:var(--flash-logo) center/contain no-repeat;-webkit-mask:var(--flash-logo) center/contain no-repeat}
-body.flash-active nav a:is(:hover,:focus-visible,:active) .icon::after{transform:scale(1.1)}

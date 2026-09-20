@@ -51,3 +51,22 @@ assert.equal(touch.gestureDirection(100,5),'ltr');assert.equal(touch.gestureDire
 assert.equal(touch.wheelDirection(100,5),'ltr');assert.equal(touch.wheelDirection(-100,5),'rtl');
 assert.equal(touch.wheelDirection(2,100),'rtl');assert.equal(touch.wheelDirection(2,-100),'ltr');
 console.log('PASS: horizontal trackpad gestures dominate vertical jitter, opposite swipes have opposite directions.');
+
+// Touch brushing changes hit letters once per crossing, never a whole horizontal wave.
+const brushA={key:'A'},brushB={key:'B'};
+touch.hit=(x,y)=>y>=40&&y<=60?(x>=0&&x<=40?brushA:x>=60&&x<=110?brushB:null):null;
+for(const [from,to] of [[10,100],[100,10]]){
+  const letters=touch.letters,waves=touch.directions.length;
+  handlers.pointerdown(event(from,50));handlers.pointermove(event(to,50));handlers.pointerup(event(to,50));
+  assert.equal(touch.letters-letters,2);assert.equal(touch.directions.length,waves);
+}
+let lettersBefore=touch.letters,wavesBefore=touch.directions.length;
+handlers.pointerdown(event(10,50));handlers.pointermove(event(10,150));handlers.pointerup(event(10,150));
+assert.equal(touch.letters,lettersBefore);assert.equal(touch.directions.length,wavesBefore+1);
+wavesBefore=touch.directions.length;
+handlers.pointerdown(event(10,200));handlers.pointermove(event(110,200));handlers.pointerup(event(110,200));
+assert.equal(touch.directions.length,wavesBefore+1);
+lettersBefore=touch.letters;wavesBefore=touch.directions.length;
+handlers.pointerdown(event(-30,50));handlers.pointerup(event(110,50));
+assert.equal(touch.letters-lettersBefore,2);assert.equal(touch.directions.length,wavesBefore);
+console.log('PASS: touch brushes both ways and across event gaps; vertical gestures and swipes outside letters still change sets.');
