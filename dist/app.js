@@ -15,7 +15,7 @@ const reflection=document.createElement('canvas'), reflectionCtx=reflection.getC
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
-const backgroundOrder=[0,6,5,1,2,3,4,7];
+const backgroundOrder=[0,6,5,1,2,7,3,4];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -54,7 +54,7 @@ function paintNoisyBackground(){
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
   if(backgroundOrder[backgroundIndex]===7){
-    document.documentElement.style.setProperty('--page-background','linear-gradient(rgba(255,255,255,.93),rgba(255,255,255,.93)),url("assets/silver-bokeh.webp") center bottom / cover no-repeat #fff');
+    document.documentElement.style.setProperty('--page-background','url("assets/silver-bokeh.webp") center bottom / cover no-repeat #fff');
     document.querySelector('meta[name="theme-color"]').content='#fafafa';return;
   }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
@@ -85,7 +85,6 @@ function paintBackground(index){
         const scale=Math.max(photoBackground.width/backgroundImage.naturalWidth,photoBackground.height/backgroundImage.naturalHeight);
         const width=backgroundImage.naturalWidth*scale,height=backgroundImage.naturalHeight*scale;
         paint.drawImage(backgroundImage,(photoBackground.width-width)/2,photoBackground.height-height,width,height);
-        paint.fillStyle='rgba(255,255,255,.93)';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
       }
       photoBackgroundDirty=false;
     }
