@@ -1,0 +1,14 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const handlers={},canvases=[];let clock=0,cost=0;
+const makeContext=()=>({globalAlpha:1,createRadialGradient:()=>({addColorStop(){}}),fillRect(){},clearRect(){},drawImage(){}});
+const sandbox={window:{},document:{createElement(){const node={getContext:makeContext};canvases.push(node);return node;},addEventListener(){}},addEventListener:(type,handler)=>handlers[type]=handler,performance:{now(){clock+=cost;return clock;}},Math};
+vm.createContext(sandbox);vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../dist/background-reveal.js'),'utf8'),sandbox);
+const effect=sandbox.window.BackgroundReveal,ctx=makeContext(),image={naturalWidth:2000},placement={x:0,y:0,width:1000,height:600};
+effect.update(0,true);handlers.pointermove({pointerType:'touch',clientX:100,clientY:100});effect.update(100,true);assert.equal(effect.stats().alpha,0);
+handlers.pointermove({pointerType:'mouse',clientX:100,clientY:100});effect.update(110,true);effect.update(310,true);assert.equal(effect.stats().alpha,1);
+ctx.globalAlpha=.4;effect.draw(ctx,image,placement);assert.equal(ctx.globalAlpha,.4);assert.equal(canvases.length,2);assert(canvases.every(c=>c.width===256&&c.height===256));
+handlers.pointerout({relatedTarget:null});effect.update(320,true);effect.update(720,true);assert.equal(effect.stats().alpha,0);
+handlers.pointermove({pointerType:'mouse',clientX:200,clientY:200});effect.update(730,true);effect.update(930,true);
+for(let i=1;i<=60;i++){effect.update(930+i*40,true);effect.draw(ctx,image,placement);}assert.equal(effect.stats().enabled,false);
+effect.update(4000,true);effect.update(4400,true);assert.equal(effect.stats().alpha,0);
+console.log('PASS: mouse-only reveal, fades, two bounded buffers, blend preservation, automatic slowdown fallback.');

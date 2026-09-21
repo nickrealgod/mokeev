@@ -2,12 +2,12 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const root=path.resolve(__dirname,'../dist');
 const nodes=[],classes=new Set();
 let seed=71823;const seededMath=Object.create(Math);seededMath.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
-const context2d=()=>new Proxy({globalAlpha:1,createLinearGradient:()=>({addColorStop(){}}),getImageData:(x,y,w,h)=>({data:new Uint8ClampedArray(w*h*4)}),createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)})},{get:(o,k)=>k in o?o[k]:()=>{}});
+const context2d=()=>new Proxy({globalAlpha:1,createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}}),getImageData:(x,y,w,h)=>({data:new Uint8ClampedArray(w*h*4)}),createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)})},{get:(o,k)=>k in o?o[k]:()=>{}});
 function node(){const n={width:0,height:0,style:{setProperty(k,v){this[k]=v;}},classList:{add:k=>classes.add(k),toggle(k,on){if(on)classes.add(k);else classes.delete(k);}},setAttribute(){},getAttribute:()=>'',append(){},addEventListener(){},querySelectorAll:()=>[],getContext:()=>context2d()};nodes.push(n);return n;}
 const stage=node(),nav=node(),body=node(),html=node(),theme=node(),keyboard=node(),error=node();
 const selectors={'#stage':stage,nav,'#keyboard':keyboard,'#error':error,'meta[name="theme-color"]':theme};
 const sandbox={window:{},document:{body,documentElement:html,createElement:node,querySelector:s=>selectors[s],querySelectorAll:()=>[],addEventListener(){}},Image:class {constructor(){this.naturalWidth=2000;this.naturalHeight=1000;}decode(){return Promise.resolve();}},matchMedia:()=>({matches:false}),innerWidth:390,innerHeight:844,devicePixelRatio:1,addEventListener(){},requestAnimationFrame:()=>1,cancelAnimationFrame(){},performance:{now:()=>0},atob:s=>Buffer.from(s,'base64').toString('binary'),console,Math:seededMath};
-vm.createContext(sandbox);for(const file of ['letters','gradients','variations','effects','app'])vm.runInContext(fs.readFileSync(path.join(root,file+'.js'),'utf8'),sandbox);
+vm.createContext(sandbox);for(const file of ['letters','gradients','variations','effects','background-reveal','app'])vm.runInContext(fs.readFileSync(path.join(root,file+'.js'),'utf8'),sandbox);
 const run=s=>vm.runInContext(s,sandbox);
 (async()=>{
   await new Promise(resolve=>setImmediate(resolve));
@@ -18,17 +18,17 @@ const run=s=>vm.runInContext(s,sandbox);
   run('draw(20000)');assert.equal(run('backgroundIndex'),5);
   run('changeBackground(1)');assert.equal(run('autoBackground'),false);assert.equal(run('backgroundIndex'),6);
   run('draw(45000)');assert.equal(run('backgroundIndex'),6);
-  run('changeBackground(-1);draw(45016)');assert.equal(run('backgroundIndex'),5);assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/mirror-grid-studio.webp/);
+  run('changeBackground(2);draw(45016)');assert.equal(run('backgroundIndex'),0);assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/Background.jpg/);
   run('draw(60000);draw(60050);draw(60100)');assert(!classes.has('flash-active'));
   assert.equal(run('timeline.hold'),1500);assert.equal(run('cameraEnd'),4500);assert.equal(run('introEnd'),7500);
-  assert(html.style['--page-background'].includes('rgba(255,255,255,.69)'));
+  assert(html.style['--page-background'].includes('rgba(255,255,255,.81)'));
   assert.equal(run('items[0].variants.black.img===items[9].variants.black.img'),true);
-  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, sixth background: mirror-grid studio with 69% white and cached 3% noise, aligned horizon, no flash, shared images.');
+  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, first background: original JPEG with 81% white, aligned horizon, no flash, shared images.');
   for(const [width,height] of [[390,844],[1280,720],[2560,1080]]){
     sandbox.innerWidth=width;sandbox.innerHeight=height;run('resize()');
     const r=run('studioPlacement()');
     assert(r.x<=0&&r.y<=0&&r.x+r.width>=width-1e-6&&r.y+r.height>=height-1e-6);
-    assert(Math.abs(r.y+r.height/2-r.horizon)<1e-6);
+    assert(Math.abs(r.y+r.height*.584-r.horizon)<1e-6);
     assert(Math.abs(r.horizon-run('(letteringY+(bounds.bottom-center[1])*fit+h-(bounds.bottom-bounds.y)*fit)/2'))<1e-6);
   }
   console.log('PASS: horizon matches reflection gap and proportional image covers portrait, landscape and ultrawide screens.');

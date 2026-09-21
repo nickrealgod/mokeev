@@ -15,7 +15,7 @@ const reflection=document.createElement('canvas'), reflectionCtx=reflection.getC
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
-const backgroundOrder=[0,6,5,1,2,7,3,4];
+const backgroundOrder=[7,0,6,5,1,2,3,4];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -27,11 +27,11 @@ const backgrounds=[
 ];
 let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=true;
 let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
-const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/mirror-grid-studio.webp';
+const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg';
 let backgroundImageReady=false;
 const photoBackground=document.createElement('canvas');
 let photoBackgroundDirty=true;
-backgroundImage.decode().then(()=>{backgroundImageReady=true;photoBackgroundDirty=true;if(backgroundOrder[backgroundIndex]===7)syncPageBackground();}).catch(error=>console.warn('Background unavailable',error));
+const backgroundReady=backgroundImage.decode().then(()=>{backgroundImageReady=true;photoBackgroundDirty=true;window.BackgroundReveal.warm(backgroundImage);if(backgroundOrder[backgroundIndex]===7)syncPageBackground();}).catch(error=>console.warn('Background unavailable',error));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -57,16 +57,17 @@ function studioPlacement(){
   const reflectionTop=h-(bounds.bottom-bounds.y)*fit;
   const horizon=(artworkBottom+reflectionTop)/2;
   const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
-  const scale=Math.max(w/iw,2*horizon/ih,2*(h-horizon)/ih);
+  const sourceHorizon=.584;
+  const scale=Math.max(w/iw,horizon/(ih*sourceHorizon),(h-horizon)/(ih*(1-sourceHorizon)));
   const width=iw*scale,height=ih*scale;
-  return {x:(w-width)/2,y:horizon-height/2,width,height,horizon};
+  return {x:(w-width)/2,y:horizon-height*sourceHorizon,width,height,horizon};
 }
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
   if(backgroundOrder[backgroundIndex]===7){
     const placement=backgroundImageReady?studioPlacement():null;
     const position=placement?`${placement.x}px ${placement.y}px / ${placement.width}px ${placement.height}px`:'center bottom / cover';
-    document.documentElement.style.setProperty('--page-background',`linear-gradient(rgba(255,255,255,.69),rgba(255,255,255,.69)),url("assets/mirror-grid-studio.webp") ${position} no-repeat #fff`);
+    document.documentElement.style.setProperty('--page-background',`linear-gradient(rgba(255,255,255,.81),rgba(255,255,255,.81)),url("assets/Background.jpg") ${position} no-repeat #fff`);
     document.querySelector('meta[name="theme-color"]').content='#fafafa';return;
   }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
@@ -96,18 +97,14 @@ function paintBackground(index){
       if(backgroundImageReady){
         const placement=studioPlacement(),dx=photoBackground.width/w,dy=photoBackground.height/h;
         paint.drawImage(backgroundImage,placement.x*dx,placement.y*dy,placement.width*dx,placement.height*dy);
-        paint.fillStyle='rgba(255,255,255,.69)';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
-        // Static monochrome uniform noise, ±3% of the 8-bit range; generated only on load/resize.
-        const pixels=paint.getImageData(0,0,photoBackground.width,photoBackground.height);
-        for(let i=0;i<pixels.data.length;i+=4){
-          const noise=(Math.random()*2-1)*255*.03;
-          for(let channel=0;channel<3;channel++)pixels.data[i+channel]=Math.round(pixels.data[i+channel]+noise);
-        }
-        paint.putImageData(pixels,0,0);
+        paint.fillStyle='rgba(255,255,255,.81)';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
+
       }
       photoBackgroundDirty=false;
     }
-    ctx.drawImage(photoBackground,0,0,w,h);return;
+    ctx.drawImage(photoBackground,0,0,w,h);
+    if(backgroundImageReady)window.BackgroundReveal.draw(ctx,backgroundImage,studioPlacement());
+    return;
   }
   if(!cachedBackground)cachedBackground=new Map();
   if(!cachedBackground.has(identity)){
@@ -343,6 +340,7 @@ function draw(now) {
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
+  window.BackgroundReveal.update(now,ready&&!reduce.matches&&backgroundOrder[backgroundIndex]===7&&!backgroundTransition);
   renderBackground(now);
   if(iconEase!==lastIconEase){
     nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
@@ -395,7 +393,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 (async()=>{
   try{
-    await Promise.all(items.map(i=>load(i,'black')));raf=requestAnimationFrame(draw);
+    await Promise.all([backgroundReady,...items.map(i=>load(i,'black'))]);raf=requestAnimationFrame(draw);
     const jobs=data.styles.filter(s=>s!=='black').flatMap(s=>items.filter(i=>data.letters[i.key][s]).map(i=>()=>load(i,s)));
     await Promise.all(Array.from({length:3},async()=>{while(jobs.length){try{await jobs.shift()();}catch(e){console.warn('Style unavailable',e);}}}));
   }catch(e){document.querySelector('#error').hidden=false;console.error(e);}
