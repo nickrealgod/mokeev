@@ -1,22 +1,22 @@
-# Silver bokeh background
+# Mirror-grid studio background
 
-Generated with the built-in image generation tool, 20 September 2026.
-Asset: `dist/assets/silver-bokeh.webp` (1536 × 1024). Sixth background in the collection, displayed with a 69% white overlay and static monochrome uniform noise (±3% of the 8-bit range), applied after the overlay, proportionally covering the viewport and aligned bottom-center. The scaled image is cached at viewport size. The environment is an artistic interpretation of the silver letters' reflections, not a reconstruction of the original lighting map.
+Generated with built-in imagegen using the user's artwork/2 mirror bubbles.png as a lighting reference. This replaces the rejected silver studio backgrounds. Native result: 1672×941; the tool returned that size despite requesting 3840×2160. No artificial upscaling.
 
-## Original generation prompt (the white overlay was subsequently changed to 69%)
+Site asset: dist/assets/mirror-grid-studio.webp.
+Original PNG: /Users/nickrealgod/Documents/Codex/artwork/mirror-grid-studio-native.png.
 
-Use case: photorealistic-natural. Asset type: wide website background, 1536x1024 or larger landscape. Generate a photographic environment that could plausibly produce the pale silver chrome reflections of inflated metallic typography: a luminous neutral photographic studio, huge soft white window lights, soft pearl gray and pale warm gray surroundings, a few very soft charcoal reflection shapes. This is only the environment, NO letters or objects in focus. Extremely defocused medium-format long-telephoto lens photograph, aperture wide open, maximum creamy optical bokeh, giant diffused out-of-focus highlights and flowing tonal masses, absolutely no sharp edges, no visible grain, no recognizable furniture, no text, no watermarks. Quiet elegant neutral silver/ivory tones, restrained natural contrast, composition works cropped landscape and portrait. Keep the original image normally exposed; a 93% white overlay will be applied separately in the website.
+The reference suggests neutral gray studio illumination with a rectangular softbox and ring flash. The generated environment imagines the unseen rear side: open wall, sky coordinate grid and mirrored floor. It is an interpretation, not recovered original scene geometry.
 
-## Performance changes
+The source horizon is at 50% image height. studioPlacement() places it exactly midway between the artwork's bottom and the reflection's top, using proportional cover with enough overscan to avoid gaps. The same placement is applied to canvas and page background, and recomputed on resize. This replaces the earlier bottom alignment because the latest request explicitly fixes the horizon to the reflection gap.
 
-- Eleven byte-identical image duplicates removed after updating references: 1,209,998 bytes saved in the repository; 166,972 bytes were duplicate WebP letter downloads.
-- Shared decoded images and hit masks for repeated assets.
-- Static photo scaled only after loading or resizing.
-- Reflection artwork reused throughout the camera introduction and while reduced motion keeps letters still.
-- Flash effects and their tint caches removed.
+Sixth background; white 69% overlay and cached static 3% noise retained. Reflection visibility now fades from 31% to zero, equivalent to hiding it by 69%→100%. Previous actual visibility was 9%, not 38%. The inactive PDF is drawn twice using two references to the same SVG; both hide on hover.
 
-Potential further improvements: draw the faint reflection at lower resolution, update it and particles at 30 fps, and separate the static background from the full-screen animation canvas. These tradeoffs should be measured on target phones before reducing visual quality.
+## Prompt
+
+Generate a NEW environment background, based on the attached two chrome mirror bubbles ONLY as a lighting/color reference. Do NOT reproduce bubbles or their reflection. The reference shows a rectangular softbox and a ring flash in FRONT of the reflective objects; now depict the imagined unseen space BEHIND those objects, not those reflected lights themselves. Octane render style, physically based architectural studio, high-key luminous neutral slightly warm gray walls and white ceiling, soft diffuse light consistent with a large rectangular softbox plus ring flash near camera. No visible ring in the center, no centered lamp.
+The rear studio wall is entirely absent: beyond the open wall is an immense luminous pale sky carrying a fine gray three-dimensional coordinate grid stretching across the entire sky. Grid perspective lines converge at ONE exact vanishing point horizontally centered on the horizon. Mirror-polished perfectly flat floor reflects that entire sky-coordinate-grid exactly below the horizon, maintaining the same central vanishing point. Side walls only at far edges, ceiling as a restrained light upper canopy, open expanse behind the lettering. Subtle medium-format photographic film feeling and soft optical bloom; gently defocused surroundings, but grid geometry must stay legible. Mostly white, pearl gray, warm gray, no saturated neon or sci-fi props.
+CRITICAL GEOMETRY: the exact horizon / sky-to-mirror seam must be at x=50%, y=50% of the generated image, perfectly level. Top and bottom are mirror-related around this center line. Long-lens nearly frontal composition; no wide-angle fisheye distortion. Preserve extra empty margins for responsive cropping; the website will align this horizon with the midpoint between its live lettering and its live reflection. No objects, letters, bubbles, typography, numbers, axis labels, logos or watermark anywhere. Do not bake lettering reflections into this empty background. Max available native resolution, request 3840x2160 landscape. Do not bake the website's white veil or added noise into image.
 
 ## Checks
 
-`node tools/check.cjs` and `node tools/atmosphere-check.cjs` cover letter variants, touch brushing, vertical and background gestures, timing, shared images, background transitions, and particle respawns. `python3 tools/dedupe-assets.py` audits exact duplicate images; `--apply` updates references and removes only verified byte-identical copies.
+Existing letter/touch/background/particle tests plus horizon alignment and full cover at 390×844, 1280×720 and 2560×1080. ESLint and git diff --check.

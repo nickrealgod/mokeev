@@ -27,11 +27,11 @@ const backgrounds=[
 ];
 let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=true;
 let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
-const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/silver-bokeh.webp';
+const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/mirror-grid-studio.webp';
 let backgroundImageReady=false;
 const photoBackground=document.createElement('canvas');
 let photoBackgroundDirty=true;
-backgroundImage.decode().then(()=>{backgroundImageReady=true;photoBackgroundDirty=true;}).catch(error=>console.warn('Background unavailable',error));
+backgroundImage.decode().then(()=>{backgroundImageReady=true;photoBackgroundDirty=true;if(backgroundOrder[backgroundIndex]===7)syncPageBackground();}).catch(error=>console.warn('Background unavailable',error));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -51,10 +51,22 @@ function paintNoisyBackground(){
   }
   ctx.drawImage(noisyBackground,0,0,w,h);
 }
+// Match the generated center horizon to the gap between the live artwork and its mirror.
+function studioPlacement(){
+  const artworkBottom=letteringY+(bounds.bottom-center[1])*fit;
+  const reflectionTop=h-(bounds.bottom-bounds.y)*fit;
+  const horizon=(artworkBottom+reflectionTop)/2;
+  const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
+  const scale=Math.max(w/iw,2*horizon/ih,2*(h-horizon)/ih);
+  const width=iw*scale,height=ih*scale;
+  return {x:(w-width)/2,y:horizon-height/2,width,height,horizon};
+}
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
   if(backgroundOrder[backgroundIndex]===7){
-    document.documentElement.style.setProperty('--page-background','linear-gradient(rgba(255,255,255,.69),rgba(255,255,255,.69)),url("assets/silver-bokeh.webp") center bottom / cover no-repeat #fff');
+    const placement=backgroundImageReady?studioPlacement():null;
+    const position=placement?`${placement.x}px ${placement.y}px / ${placement.width}px ${placement.height}px`:'center bottom / cover';
+    document.documentElement.style.setProperty('--page-background',`linear-gradient(rgba(255,255,255,.69),rgba(255,255,255,.69)),url("assets/mirror-grid-studio.webp") ${position} no-repeat #fff`);
     document.querySelector('meta[name="theme-color"]').content='#fafafa';return;
   }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
@@ -82,9 +94,8 @@ function paintBackground(index){
       photoBackground.width=canvas.width;photoBackground.height=canvas.height;
       const paint=photoBackground.getContext('2d');paint.fillStyle='#fff';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
       if(backgroundImageReady){
-        const scale=Math.max(photoBackground.width/backgroundImage.naturalWidth,photoBackground.height/backgroundImage.naturalHeight);
-        const width=backgroundImage.naturalWidth*scale,height=backgroundImage.naturalHeight*scale;
-        paint.drawImage(backgroundImage,(photoBackground.width-width)/2,photoBackground.height-height,width,height);
+        const placement=studioPlacement(),dx=photoBackground.width/w,dy=photoBackground.height/h;
+        paint.drawImage(backgroundImage,placement.x*dx,placement.y*dy,placement.width*dx,placement.height*dy);
         paint.fillStyle='rgba(255,255,255,.69)';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
         // Static monochrome uniform noise, ±3% of the 8-bit range; generated only on load/resize.
         const pixels=paint.getImageData(0,0,photoBackground.width,photoBackground.height);
@@ -129,6 +140,7 @@ function resize() {
   const top=letteringY+(bounds.y-center[1])*fit;
   linksTop=Math.max(60,top/2);
   document.body.style.setProperty('--links-top',`${linksTop}px`);
+  if(backgroundOrder[backgroundIndex]===7)syncPageBackground();
 }
 addEventListener('resize', resize); resize();
 // Share decoded images and hit masks when multiple letters use the same asset.
@@ -350,6 +362,8 @@ function draw(now) {
   }
   ctx.restore();
   {
+    // Front-on long-lens studio: mirror at identical horizontal scale.
+    // The background floor fills the lower half; this live reflection reaches the bottom.
     // Mirror the live artwork, including the current gradient surfaces and drift.
     const height=(bounds.bottom-bounds.y)*fit;
     const reflectionTop=h-height;
@@ -364,7 +378,7 @@ function draw(now) {
       rc.restore();
       if(!reflectionFade){
         reflectionFade=rc.createLinearGradient(0,3,0,height+3);
-        reflectionFade.addColorStop(0,'rgba(0,0,0,0.09)');reflectionFade.addColorStop(1,'rgba(0,0,0,0)');
+        reflectionFade.addColorStop(0,'rgba(0,0,0,0.31)');reflectionFade.addColorStop(1,'rgba(0,0,0,0)');
       }
       rc.globalCompositeOperation='destination-in';rc.fillStyle=reflectionFade;rc.fillRect(0,0,w,height+6);rc.globalCompositeOperation='source-over';
       reflectionDirty=false;

@@ -18,12 +18,20 @@ const run=s=>vm.runInContext(s,sandbox);
   run('draw(20000)');assert.equal(run('backgroundIndex'),5);
   run('changeBackground(1)');assert.equal(run('autoBackground'),false);assert.equal(run('backgroundIndex'),6);
   run('draw(45000)');assert.equal(run('backgroundIndex'),6);
-  run('changeBackground(-1);draw(45016)');assert.equal(run('backgroundIndex'),5);assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/center bottom \/ cover/);
+  run('changeBackground(-1);draw(45016)');assert.equal(run('backgroundIndex'),5);assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/mirror-grid-studio.webp/);
   run('draw(60000);draw(60050);draw(60100)');assert(!classes.has('flash-active'));
   assert.equal(run('timeline.hold'),1500);assert.equal(run('cameraEnd'),4500);assert.equal(run('introEnd'),7500);
   assert(html.style['--page-background'].includes('rgba(255,255,255,.69)'));
   assert.equal(run('items[0].variants.black.img===items[9].variants.black.img'),true);
-  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, sixth background: bokeh with 69% white, cached 3% noise and bottom-center cover, no flash, shared images.');
+  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, sixth background: mirror-grid studio with 69% white and cached 3% noise, aligned horizon, no flash, shared images.');
+  for(const [width,height] of [[390,844],[1280,720],[2560,1080]]){
+    sandbox.innerWidth=width;sandbox.innerHeight=height;run('resize()');
+    const r=run('studioPlacement()');
+    assert(r.x<=0&&r.y<=0&&r.x+r.width>=width-1e-6&&r.y+r.height>=height-1e-6);
+    assert(Math.abs(r.y+r.height/2-r.horizon)<1e-6);
+    assert(Math.abs(r.horizon-run('(letteringY+(bounds.bottom-center[1])*fit+h-(bounds.bottom-bounds.y)*fit)/2'))<1e-6);
+  }
+  console.log('PASS: horizon matches reflection gap and proportional image covers portrait, landscape and ultrawide screens.');
   const dots=nodes.filter(n=>n.className?.startsWith('floating-dot'));assert.equal(dots.length,19);
   const e=sandbox.window.SiteEffects;e.showDot(true);
   let previous=[],respawns=0,sawOutside=false,largeColors=new Set();
