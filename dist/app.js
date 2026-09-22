@@ -63,24 +63,24 @@ function changeBackground(direction=1){
   backgroundIndex=(backgroundIndex+direction+backgroundOrder.length)%backgroundOrder.length;syncPageBackground();
 }
 function advanceBackground(now){
-  if(nextAutoBackground===null)nextAutoBackground=now+10000;
+  if(nextAutoBackground===null)nextAutoBackground=now+20000;
   if(autoBackground&&now>=nextAutoBackground){
     const next=firstAutoBackground?4:(backgroundIndex+1)%backgroundOrder.length;
     backgroundTransition={from:backgroundIndex,at:now};backgroundIndex=next;
-    firstAutoBackground=false;nextAutoBackground=now+10000;window.SiteEffects.hideDot();syncPageBackground();
+    firstAutoBackground=false;nextAutoBackground=now+15000;window.SiteEffects.hideDot();syncPageBackground();
   }
   if(backgroundTransition&&now-backgroundTransition.at>=250)backgroundTransition=null;
 }
-function paintBackground(index,angle=0){
+function paintBackground(index,camera){
   const identity=backgroundOrder[index];
   if(identity===7){
     const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
     if(!iw||!ih){ctx.fillStyle='#f7fafe';ctx.fillRect(0,0,w,h);return;}
-    // Cover the inverse-rotated viewport, retaining the source aspect ratio.
-    const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
-    const scale=Math.max((w*c+h*s)/iw,(w*s+h*c)/ih);
-    ctx.save();ctx.translate(w/2,h/2);ctx.rotate(angle);
-    ctx.drawImage(backgroundImage,-iw*scale/2,-ih*scale/2,iw*scale,ih*scale);ctx.restore();return;
+    const scale=Math.max(w/iw,h/ih);
+    // The photo occupies fixed world coordinates, just like letters and reflection.
+    ctx.save();applyCamera(camera);
+    ctx.drawImage(backgroundImage,center[0]-iw*scale/(2*fit),center[1]+(h/2-letteringY-ih*scale/2)/fit,iw*scale/fit,ih*scale/fit);
+    ctx.restore();return;
   }
   if(identity===6){paintNoisyBackground();return;}
   if(!cachedBackground)cachedBackground=new Map();
@@ -91,11 +91,11 @@ function paintBackground(index,angle=0){
   }
   ctx.fillStyle=cachedBackground.get(identity);ctx.fillRect(0,0,w,h);
 }
-function renderBackground(now,angle){
+function renderBackground(now,camera){
   if(backgroundTransition){
-    paintBackground(backgroundTransition.from,angle);
-    ctx.globalAlpha=easeOut(Math.min(1,(now-backgroundTransition.at)/250));paintBackground(backgroundIndex,angle);ctx.globalAlpha=1;
-  }else paintBackground(backgroundIndex,angle);
+    paintBackground(backgroundTransition.from,camera);
+    ctx.globalAlpha=easeOut(Math.min(1,(now-backgroundTransition.at)/250));paintBackground(backgroundIndex,camera);ctx.globalAlpha=1;
+  }else paintBackground(backgroundIndex,camera);
 }
 syncPageBackground();
 const all = Object.values(data.letters).flatMap(v => Object.values(v));
@@ -280,6 +280,9 @@ items.forEach(item=>{
   button.addEventListener('focus',()=>focused=item);button.addEventListener('blur',()=>focused=null);
   document.querySelector('#keyboard').append(button);
 });
+function applyCamera(camera){
+  ctx.translate(w/2,camera.y);ctx.rotate(camera.angle);ctx.scale(camera.zoom,camera.zoom);ctx.translate(-camera.cx,-camera.cy);
+}
 function draw(now) {
   if(start===null) start=now;
   advanceWave(now);
@@ -316,12 +319,14 @@ function draw(now) {
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
-  renderBackground(now,angle);
+  const camera={y:h*.5*(1-ease)+letteringY*ease,angle,zoom,cx,cy};
+  ctx.fillStyle="#f7fafe";ctx.fillRect(0,0,w,h);
+  renderBackground(now,camera);
   if(iconEase!==lastIconEase){
     nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
     nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);lastIconEase=iconEase;
   }
-  ctx.translate(w/2,h*.5*(1-ease)+letteringY*ease);ctx.rotate(angle);ctx.scale(zoom,zoom);ctx.translate(-cx,-cy);
+  applyCamera(camera);
   ctx.save();ctx.translate(0,scrollShift/fit);
   for(const item of items){
     if(ready&&!reduce.matches){
