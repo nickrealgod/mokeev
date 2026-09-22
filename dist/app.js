@@ -15,7 +15,7 @@ const reflection=document.createElement('canvas'), reflectionCtx=reflection.getC
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
-const backgroundOrder=[7,0,6,5,1,2,3,4];
+const backgroundOrder=[0,6,5,1,2,3,4];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -27,11 +27,6 @@ const backgrounds=[
 ];
 let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=true;
 let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
-const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg';
-let backgroundImageReady=false;
-const photoBackground=document.createElement('canvas');
-let photoBackgroundDirty=true;
-const backgroundReady=backgroundImage.decode().then(()=>{backgroundImageReady=true;photoBackgroundDirty=true;window.BackgroundReveal.warm(backgroundImage);if(backgroundOrder[backgroundIndex]===7)syncPageBackground();}).catch(error=>console.warn('Background unavailable',error));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -51,31 +46,14 @@ function paintNoisyBackground(){
   }
   ctx.drawImage(noisyBackground,0,0,w,h);
 }
-// Match the generated center horizon to the gap between the live artwork and its mirror.
-function studioPlacement(){
-  const artworkBottom=letteringY+(bounds.bottom-center[1])*fit;
-  const reflectionTop=h-(bounds.bottom-bounds.y)*fit;
-  const horizon=(artworkBottom+reflectionTop)/2;
-  const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
-  const sourceHorizon=.584;
-  const scale=Math.max(w/iw,horizon/(ih*sourceHorizon),(h-horizon)/(ih*(1-sourceHorizon)));
-  const width=iw*scale,height=ih*scale;
-  return {x:(w-width)/2,y:horizon-height*sourceHorizon,width,height,horizon};
-}
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
-  if(backgroundOrder[backgroundIndex]===7){
-    const placement=backgroundImageReady?studioPlacement():null;
-    const position=placement?`${placement.x}px ${placement.y}px / ${placement.width}px ${placement.height}px`:'center bottom / cover';
-    document.documentElement.style.setProperty('--page-background',`linear-gradient(rgba(255,255,255,.81),rgba(255,255,255,.81)),url("assets/Background.jpg") ${position} no-repeat #fff`);
-    document.querySelector('meta[name="theme-color"]').content='#fafafa';return;
-  }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
 }
 function changeBackground(direction=1){
-  autoBackground=false;backgroundTransition=null;window.SiteEffects.hideDot();
+  autoBackground=false;backgroundTransition={from:backgroundIndex,at:performance.now()};window.SiteEffects.hideDot();
   backgroundIndex=(backgroundIndex+direction+backgroundOrder.length)%backgroundOrder.length;syncPageBackground();
 }
 function advanceBackground(now){
@@ -85,27 +63,11 @@ function advanceBackground(now){
     backgroundTransition={from:backgroundIndex,at:now};backgroundIndex=next;
     firstAutoBackground=false;nextAutoBackground=now+10000;window.SiteEffects.hideDot();syncPageBackground();
   }
-  if(backgroundTransition&&now-backgroundTransition.at>=2000)backgroundTransition=null;
+  if(backgroundTransition&&now-backgroundTransition.at>=250)backgroundTransition=null;
 }
 function paintBackground(index){
   const identity=backgroundOrder[index];
   if(identity===6){paintNoisyBackground();return;}
-  if(identity===7){
-    if(photoBackgroundDirty){
-      photoBackground.width=canvas.width;photoBackground.height=canvas.height;
-      const paint=photoBackground.getContext('2d');paint.fillStyle='#fff';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
-      if(backgroundImageReady){
-        const placement=studioPlacement(),dx=photoBackground.width/w,dy=photoBackground.height/h;
-        paint.drawImage(backgroundImage,placement.x*dx,placement.y*dy,placement.width*dx,placement.height*dy);
-        paint.fillStyle='rgba(255,255,255,.81)';paint.fillRect(0,0,photoBackground.width,photoBackground.height);
-
-      }
-      photoBackgroundDirty=false;
-    }
-    ctx.drawImage(photoBackground,0,0,w,h);
-    if(backgroundImageReady)window.BackgroundReveal.draw(ctx,backgroundImage,studioPlacement());
-    return;
-  }
   if(!cachedBackground)cachedBackground=new Map();
   if(!cachedBackground.has(identity)){
     const gradient=ctx.createLinearGradient(0,0,0,h);
@@ -117,7 +79,7 @@ function paintBackground(index){
 function renderBackground(now){
   if(backgroundTransition){
     paintBackground(backgroundTransition.from);
-    ctx.globalAlpha=easeOut(Math.min(1,(now-backgroundTransition.at)/2000));paintBackground(backgroundIndex);ctx.globalAlpha=1;
+    ctx.globalAlpha=easeOut(Math.min(1,(now-backgroundTransition.at)/250));paintBackground(backgroundIndex);ctx.globalAlpha=1;
   }else paintBackground(backgroundIndex);
 }
 syncPageBackground();
@@ -128,7 +90,7 @@ const baseline=Math.max(...order.slice(0,6).map(key=>data.letters[key].black.y+d
 const euro=data.letters['€'].black, focus=[euro.x+euro.w*.6,euro.y+euro.h/2];
 nav.inert = true;
 function resize() {
-  w=innerWidth; h=innerHeight;cachedBackground=null;reflectionFade=null;reflectionDirty=true;photoBackgroundDirty=true;
+  w=innerWidth; h=innerHeight;cachedBackground=null;reflectionFade=null;reflectionDirty=true;
   // Preserve Retina detail while keeping the canvas within mobile memory limits.
   const dpr=Math.min(devicePixelRatio||1, Math.sqrt(16777216/(w*h)), 8192/w, 8192/h);
   canvas.width=Math.round(w*dpr); canvas.height=Math.round(h*dpr);
@@ -137,7 +99,6 @@ function resize() {
   const top=letteringY+(bounds.y-center[1])*fit;
   linksTop=Math.max(60,top/2);
   document.body.style.setProperty('--links-top',`${linksTop}px`);
-  if(backgroundOrder[backgroundIndex]===7)syncPageBackground();
 }
 addEventListener('resize', resize); resize();
 // Share decoded images and hit masks when multiple letters use the same asset.
@@ -340,7 +301,6 @@ function draw(now) {
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
-  window.BackgroundReveal.update(now,ready&&!reduce.matches&&backgroundOrder[backgroundIndex]===7&&!backgroundTransition);
   renderBackground(now);
   if(iconEase!==lastIconEase){
     nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
@@ -393,7 +353,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 (async()=>{
   try{
-    await Promise.all([backgroundReady,...items.map(i=>load(i,'black'))]);raf=requestAnimationFrame(draw);
+    await Promise.all(items.map(i=>load(i,'black')));raf=requestAnimationFrame(draw);
     const jobs=data.styles.filter(s=>s!=='black').flatMap(s=>items.filter(i=>data.letters[i.key][s]).map(i=>()=>load(i,s)));
     await Promise.all(Array.from({length:3},async()=>{while(jobs.length){try{await jobs.shift()();}catch(e){console.warn('Style unavailable',e);}}}));
   }catch(e){document.querySelector('#error').hidden=false;console.error(e);}

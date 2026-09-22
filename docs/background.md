@@ -1,9 +1,13 @@
-# Original photograph and cursor reveal
+# Backgrounds
 
-Source: `/Users/nickrealgod/Documents/Codex/artwork/Background.jpg`, copied byte-for-byte to `dist/assets/Background.jpg` (2752×1536). This is the only photographic background and starts the page. All procedural backgrounds keep their relative order. The source horizon is approximately 58.4% down this photograph; proportional cropping aligns it to the live reflection gap.
+Seven procedural backgrounds, with no photographic assets or cursor reveal.
 
-White overlay: 81%. The previous generated photograph and added photo noise are removed. A mouse-only radial reveal has a 256px diameter and exposes the original picture completely at its center. Its mask is rendered once, the image crop refreshes only when the pointer or framing changes, and compositing uses the existing page animation loop. The reveal is drawn behind letters and reflections. Entrance: 180ms ease-out; exit: 350ms ease-out. No blur filter, glitch, full-screen mask, or extra RAF loop.
+1. Gradient #F7FAFE → #FFF8ED (initial).
+2. Gradient #C0C0C4 → #BEC1C5, cached 2% uniform color noise.
+3. #E4E7EB.
+4. #FFFFFF.
+5. #FBF8FF.
+6. Gradient #D0DBE6 → #E7EAF1 → #E4E8EF.
+7. #BEC1C5.
 
-Two 256×256 buffers use approximately 512 KiB of RGBA pixel storage. Desktop reduced-motion users and touch users receive the static overlay. The effect disables itself for the session if sustained frame intervals deteriorate beyond max(28ms, 1.4×idle baseline), or its measured JavaScript draw submission cost averages above 2ms. Submission time does not measure full GPU time; the frame-interval guard is conservative and cannot attribute every slowdown to this effect. The image is warmed in the small patch canvas before the intro begins. A local desktop sample before warm-up measured 0.39ms average draw submission, with a single initial 46.4ms spike and zero sustained slow frames; this is not a cross-device GPU benchmark. Localhost logs one sample after 120 reveal draws for verification; no performance log is emitted in production.
-
-Tests: `node tools/check.cjs`, `node tools/atmosphere-check.cjs`, `node tools/reveal-check.cjs` and ESLint.
+Manual and automatic transitions use cubic ease-out over 250 ms. Automatic changes remain every 10 seconds until the first manual change.

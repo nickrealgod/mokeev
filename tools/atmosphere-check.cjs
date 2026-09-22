@@ -7,31 +7,22 @@ function node(){const n={width:0,height:0,style:{setProperty(k,v){this[k]=v;}},c
 const stage=node(),nav=node(),body=node(),html=node(),theme=node(),keyboard=node(),error=node();
 const selectors={'#stage':stage,nav,'#keyboard':keyboard,'#error':error,'meta[name="theme-color"]':theme};
 const sandbox={window:{},document:{body,documentElement:html,createElement:node,querySelector:s=>selectors[s],querySelectorAll:()=>[],addEventListener(){}},Image:class {constructor(){this.naturalWidth=2000;this.naturalHeight=1000;}decode(){return Promise.resolve();}},matchMedia:()=>({matches:false}),innerWidth:390,innerHeight:844,devicePixelRatio:1,addEventListener(){},requestAnimationFrame:()=>1,cancelAnimationFrame(){},performance:{now:()=>0},atob:s=>Buffer.from(s,'base64').toString('binary'),console,Math:seededMath};
-vm.createContext(sandbox);for(const file of ['letters','gradients','variations','effects','background-reveal','app'])vm.runInContext(fs.readFileSync(path.join(root,file+'.js'),'utf8'),sandbox);
+vm.createContext(sandbox);for(const file of ['letters','gradients','variations','effects','app'])vm.runInContext(fs.readFileSync(path.join(root,file+'.js'),'utf8'),sandbox);
 const run=s=>vm.runInContext(s,sandbox);
 (async()=>{
   await new Promise(resolve=>setImmediate(resolve));
   run('draw(0);draw(9999)');assert.equal(run('backgroundIndex'),0);
   run('draw(10000)');assert.equal(run('backgroundIndex'),4);assert(run('backgroundTransition!==null'));
-  run('draw(11000)');assert(run('backgroundTransition!==null'));
-  run('draw(12000)');assert.equal(run('backgroundTransition'),null);
+  run('draw(10125)');assert(run('backgroundTransition!==null'));
+  run('draw(10250)');assert.equal(run('backgroundTransition'),null);
   run('draw(20000)');assert.equal(run('backgroundIndex'),5);
   run('changeBackground(1)');assert.equal(run('autoBackground'),false);assert.equal(run('backgroundIndex'),6);
   run('draw(45000)');assert.equal(run('backgroundIndex'),6);
-  run('changeBackground(2);draw(45016)');assert.equal(run('backgroundIndex'),0);assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/Background.jpg/);
+  run('changeBackground(1);draw(45016)');assert.equal(run('backgroundIndex'),0);assert.equal(run('backgroundOrder[backgroundIndex]'),0);assert.match(html.style['--page-background'],/247,250,254/);
   run('draw(60000);draw(60050);draw(60100)');assert(!classes.has('flash-active'));
   assert.equal(run('timeline.hold'),1500);assert.equal(run('cameraEnd'),4500);assert.equal(run('introEnd'),7500);
-  assert(html.style['--page-background'].includes('rgba(255,255,255,.81)'));
   assert.equal(run('items[0].variants.black.img===items[9].variants.black.img'),true);
-  console.log('PASS: doubled intro, automatic fifth background at 10s, 2s transition, manual cancellation, first background: original JPEG with 81% white, aligned horizon, no flash, shared images.');
-  for(const [width,height] of [[390,844],[1280,720],[2560,1080]]){
-    sandbox.innerWidth=width;sandbox.innerHeight=height;run('resize()');
-    const r=run('studioPlacement()');
-    assert(r.x<=0&&r.y<=0&&r.x+r.width>=width-1e-6&&r.y+r.height>=height-1e-6);
-    assert(Math.abs(r.y+r.height*.584-r.horizon)<1e-6);
-    assert(Math.abs(r.horizon-run('(letteringY+(bounds.bottom-center[1])*fit+h-(bounds.bottom-bounds.y)*fit)/2'))<1e-6);
-  }
-  console.log('PASS: horizon matches reflection gap and proportional image covers portrait, landscape and ultrawide screens.');
+  console.log('PASS: doubled intro, automatic changes at 10s, 250ms transition, manual cancellation, initial light gradient, no flash, shared images.');
   const dots=nodes.filter(n=>n.className?.startsWith('floating-dot'));assert.equal(dots.length,19);
   const e=sandbox.window.SiteEffects;e.showDot(true);
   let previous=[],respawns=0,sawOutside=false,largeColors=new Set();
