@@ -15,7 +15,7 @@ const reflection=document.createElement('canvas'), reflectionCtx=reflection.getC
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
-const backgroundOrder=[0,6,5,1,2,3,4];
+const backgroundOrder=[7,0,6,5,1,2,3,4];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -27,6 +27,8 @@ const backgrounds=[
 ];
 let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=true;
 let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
+const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg';
+const backgroundReady=backgroundImage.decode().catch(error=>console.warn('Background unavailable',error));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -48,6 +50,10 @@ function paintNoisyBackground(){
 }
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
+  if(backgroundOrder[backgroundIndex]===7){
+    document.documentElement.style.setProperty('--page-background','url("assets/Background.jpg") center / cover no-repeat #f7fafe');
+    document.querySelector('meta[name="theme-color"]').content='#f7fafe';return;
+  }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
   document.documentElement.style.setProperty('--page-background','linear-gradient(to bottom,'+stops.map(([at,rgb])=>'rgb('+rgb.join(',')+') '+at*100+'%').join(',')+')');
   document.querySelector('meta[name="theme-color"]').content='rgb('+stops[0][1].join(',')+')';
@@ -65,8 +71,17 @@ function advanceBackground(now){
   }
   if(backgroundTransition&&now-backgroundTransition.at>=250)backgroundTransition=null;
 }
-function paintBackground(index){
+function paintBackground(index,angle=0){
   const identity=backgroundOrder[index];
+  if(identity===7){
+    const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
+    if(!iw||!ih){ctx.fillStyle='#f7fafe';ctx.fillRect(0,0,w,h);return;}
+    // Cover the inverse-rotated viewport, retaining the source aspect ratio.
+    const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
+    const scale=Math.max((w*c+h*s)/iw,(w*s+h*c)/ih);
+    ctx.save();ctx.translate(w/2,h/2);ctx.rotate(angle);
+    ctx.drawImage(backgroundImage,-iw*scale/2,-ih*scale/2,iw*scale,ih*scale);ctx.restore();return;
+  }
   if(identity===6){paintNoisyBackground();return;}
   if(!cachedBackground)cachedBackground=new Map();
   if(!cachedBackground.has(identity)){
@@ -76,11 +91,11 @@ function paintBackground(index){
   }
   ctx.fillStyle=cachedBackground.get(identity);ctx.fillRect(0,0,w,h);
 }
-function renderBackground(now){
+function renderBackground(now,angle){
   if(backgroundTransition){
-    paintBackground(backgroundTransition.from);
-    ctx.globalAlpha=easeOut(Math.min(1,(now-backgroundTransition.at)/250));paintBackground(backgroundIndex);ctx.globalAlpha=1;
-  }else paintBackground(backgroundIndex);
+    paintBackground(backgroundTransition.from,angle);
+    ctx.globalAlpha=easeOut(Math.min(1,(now-backgroundTransition.at)/250));paintBackground(backgroundIndex,angle);ctx.globalAlpha=1;
+  }else paintBackground(backgroundIndex,angle);
 }
 syncPageBackground();
 const all = Object.values(data.letters).flatMap(v => Object.values(v));
@@ -301,7 +316,7 @@ function draw(now) {
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
-  renderBackground(now);
+  renderBackground(now,angle);
   if(iconEase!==lastIconEase){
     nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
     nav.style.setProperty('--icon-travel',`${(1-iconEase)*120}px`);lastIconEase=iconEase;
@@ -353,7 +368,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 (async()=>{
   try{
-    await Promise.all(items.map(i=>load(i,'black')));raf=requestAnimationFrame(draw);
+    await Promise.all([backgroundReady,...items.map(i=>load(i,'black'))]);raf=requestAnimationFrame(draw);
     const jobs=data.styles.filter(s=>s!=='black').flatMap(s=>items.filter(i=>data.letters[i.key][s]).map(i=>()=>load(i,s)));
     await Promise.all(Array.from({length:3},async()=>{while(jobs.length){try{await jobs.shift()();}catch(e){console.warn('Style unavailable',e);}}}));
   }catch(e){document.querySelector('#error').hidden=false;console.error(e);}

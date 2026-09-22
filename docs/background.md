@@ -1,8 +1,8 @@
 # Backgrounds
 
-Seven procedural backgrounds, with no photographic assets or cursor reveal.
+The initial background is assets/Background.jpg, shown without overlays. It rotates with the lettering during the introduction; proportional cover sizing accounts for rotation so no viewport corners are exposed. Seven procedural backgrounds follow. No cursor reveal.
 
-1. Gradient #F7FAFE → #FFF8ED (initial).
+1. Gradient #F7FAFE → #FFF8ED .
 2. Gradient #C0C0C4 → #BEC1C5, cached 2% uniform color noise.
 3. #E4E7EB.
 4. #FFFFFF.
