@@ -27,7 +27,7 @@ const backgrounds=[
 ];
 let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=true;
 let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
-const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg';
+const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg?v=b7f655fa';
 const backgroundReady=backgroundImage.decode().catch(error=>console.warn('Background unavailable',error));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
@@ -51,7 +51,7 @@ function paintNoisyBackground(){
 function syncPageBackground(){
   document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
   if(backgroundOrder[backgroundIndex]===7){
-    document.documentElement.style.setProperty('--page-background','url("assets/Background.jpg") center / cover no-repeat #f7fafe');
+    document.documentElement.style.setProperty('--page-background','url("assets/Background.jpg?v=b7f655fa") center / cover no-repeat #f7fafe');
     document.querySelector('meta[name="theme-color"]').content='#f7fafe';return;
   }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
