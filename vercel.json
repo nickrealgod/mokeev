@@ -6,19 +6,6 @@
   "outputDirectory": "dist",
   "headers": [
     {
-      "source": "/assets/Designer Mokeev.pdf",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/pdf"
-        },
-        {
-          "key": "Content-Disposition",
-          "value": "inline"
-        }
-      ]
-    },
-    {
       "source": "/assets/(.*)",
       "headers": [
         {
