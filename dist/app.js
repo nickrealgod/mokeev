@@ -14,6 +14,7 @@ const introEnd = iconsEnd;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
+let scenePainted=false;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
 const backgroundOrder=[7,0,6,5,1,2,3,4];
 const backgrounds=[
@@ -365,6 +366,7 @@ function draw(now) {
     ctx.drawImage(reflection,center[0]-w/(2*fit),center[1]+(reflectionTop-3-letteringY-scrollShift)/fit,w/fit,(height+6)/fit);
   }
   window.SiteEffects.drawDot(now,w,h,reduce.matches);
+  if(!scenePainted){scenePainted=true;document.documentElement.classList.add("scene-painted");}
   raf=requestAnimationFrame(draw);
 }
 document.addEventListener('visibilitychange',()=>{
@@ -376,5 +378,5 @@ document.addEventListener('visibilitychange',()=>{
     await Promise.all([backgroundReady,...items.map(i=>load(i,'black'))]);raf=requestAnimationFrame(draw);
     const jobs=data.styles.filter(s=>s!=='black').flatMap(s=>items.filter(i=>data.letters[i.key][s]).map(i=>()=>load(i,s)));
     await Promise.all(Array.from({length:3},async()=>{while(jobs.length){try{await jobs.shift()();}catch(e){console.warn('Style unavailable',e);}}}));
-  }catch(e){document.querySelector('#error').hidden=false;console.error(e);}
+  }catch(e){document.documentElement.classList.add('scene-painted');document.querySelector('#error').hidden=false;console.error(e);}
 })();
