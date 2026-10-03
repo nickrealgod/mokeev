@@ -50,7 +50,6 @@ function paintNoisyBackground(){
   ctx.drawImage(noisyBackground,0,0,w,h);
 }
 function syncPageBackground(){
-  document.body.classList.toggle("no-icon-glow",backgroundOrder[backgroundIndex]>=3);
   if(backgroundOrder[backgroundIndex]===7){
     document.documentElement.style.setProperty('--page-background','url("assets/Background.jpg?v=b7f655fa") center / cover no-repeat #f7fafe');
     document.querySelector('meta[name="theme-color"]').content='#f7fafe';return;

@@ -26,6 +26,19 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
+    },
+    {
+      "source": "/assets/mokeev-lead-product-designer-6a42b9073b37.pdf",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/pdf"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "attachment; filename=\"Mokeev - Lead Product Designer.pdf\"; filename*=UTF-8''Mokeev%20%E2%80%93%20Lead%20Product%20Designer.pdf"
+        }
+      ]
     }
   ]
 }
