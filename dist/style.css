@@ -91,3 +91,6 @@ nav a:hover .icon img.state-idle,nav a:focus-visible .icon img.state-idle,nav a:
 .floating-dot::before{content:"";position:absolute;inset:0;border-radius:inherit;background:inherit;filter:blur(var(--dot-blur,0px));pointer-events:none}
 
 .floating-dot-large{filter:blur(var(--dot-blur,0px))}.floating-dot-large::before{display:none}
+
+/* Opacity on the shared icon container also keeps the doubled PDF at 50%. */
+nav .icon{opacity:.5}nav a:is(:hover,:focus-visible,:active) .icon{opacity:1}

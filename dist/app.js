@@ -7,16 +7,16 @@ const order = ['M','O','K','E','€','V','*','C','Oo','M2'];
 const items = order.map(key => ({ key, style:'black', gradient:-1, surface:null, cycles:{}, variants:{}, x:0, y:0, from:[0,0], to:[0,0], driftAt:0 }));
 const easeOut = t => 1 - Math.pow(1-t,3);
 const progress = (elapsed, start, duration) => reduce.matches ? 1 : Math.max(0, Math.min(1,(elapsed-start)/duration));
-const timeline = { hold:1500, camera:3000, icons:3000 };
+const timeline = { hold:2000, camera:3000, icons:3000 };
 const cameraEnd = timeline.hold + timeline.camera;
 const iconsEnd = cameraEnd + timeline.icons;
 const introEnd = iconsEnd;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
-let scenePainted=false;
+let scenePainted=false,euroIntroFinished=false;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
-const backgroundOrder=[7,0,6,5,1,2,3,4];
+const backgroundOrder=[7,6,5,1,2,3,4,0];
 const backgrounds=[
   [[0,[247,250,254]],[1,[255,248,237]]],
   [[0,[255,255,255]],[1,[255,255,255]]],
@@ -118,16 +118,18 @@ function resize() {
 addEventListener('resize', resize); resize();
 // Share decoded images and hit masks when multiple letters use the same asset.
 const imageCache=new Map(),maskCache=new Map();
-async function load(item, style) {
+async function load(item, style, standard=false) {
   const info=data.letters[item.key][style];
-  const src=item.key==='€' && style==='black' ? 'assets/letters/black/euro-original.png' : info.src;
+  const src=item.key==='€' && style==='black' && !standard ? 'assets/letters/black/euro-intro.png' : info.src;
   if(!imageCache.has(src)){
     const img=new Image();img.decoding='async';img.src=src;
     imageCache.set(src,img.decode().then(()=>img).catch(error=>{imageCache.delete(src);throw error;}));
   }
   const img=await imageCache.get(src);
   if(!maskCache.has(info.mask))maskCache.set(info.mask,Uint8Array.from(atob(info.mask),c=>c.charCodeAt(0)));
-  item.variants[style]={...info,img,alpha:maskCache.get(info.mask)};
+  const introEuro=item.key==='€'&&style==='black'&&!standard;
+  const width=introEuro?info.h*img.naturalWidth/img.naturalHeight:info.w;
+  item.variants[style]={...info,x:info.x+(info.w-width)/2,w:width,img,alpha:maskCache.get(info.mask)};
 }
 function apply(item, style, gradient) {
   item.style=style; item.gradient=gradient; item.surface=null;reflectionDirty=true;
@@ -289,7 +291,7 @@ function draw(now) {
   scrollShift=window.SiteEffects.scrollOffset(now,reduce.matches);
   const elapsed=now-start;
   advanceBackground(now);
-  const turn=progress(elapsed,1100,cameraEnd-1100);
+  const turn=progress(elapsed,2000,timeline.camera);
   const ease=turn*turn*(3-2*turn);
   const iconEase=easeOut(progress(elapsed,cameraEnd,timeline.icons));
   if((reduce.matches||elapsed>=introEnd)&&!ready){
@@ -298,23 +300,20 @@ function draw(now) {
   }
   let zoom=fit;
   if(!reduce.matches&&elapsed<cameraEnd){
-    // Start at half the previous magnification. Snap to native or 2x source
-    // density only when that stays within 20% of the requested framing.
-    const desiredZoom=h/euro.w;
-    const sourceWidth=items.find(item=>item.key==='€').variants.black.img.naturalWidth;
-    const renderRatio=desiredZoom*euro.w*(canvas.width/w)/sourceWidth;
-    const density=[.5,1].reduce((a,b)=>Math.abs(b-renderRatio)<Math.abs(a-renderRatio)?b:a);
-    const initialZoom=Math.abs(density/renderRatio-1)<=.2?desiredZoom*density/renderRatio:desiredZoom;
-    // Cubic Hermite segments share position and velocity at 1500 ms.
-    const startZoom=2*initialZoom,midZoom=startZoom*.62;
-    const joinSpeed=-(midZoom-fit)/timeline.camera;
-    const hermite=(a,b,va,vb,t,d)=>{
-      const t2=t*t,t3=t2*t;
-      return (2*t3-3*t2+1)*a+(t3-2*t2+t)*d*va+(-2*t3+3*t2)*b+(t3-t2)*d*vb;
-    };
-    zoom=elapsed<timeline.hold
-      ?hermite(startZoom,midZoom,-(startZoom-midZoom)/timeline.hold,joinSpeed,progress(elapsed,0,timeline.hold),timeline.hold)
-      :hermite(midZoom,fit,joinSpeed,0,progress(elapsed,timeline.hold,timeline.camera),timeline.camera);
+    // At 90 degrees, source width maps to viewport height. Never upscale on frame one.
+    const source=items.find(item=>item.key==='€').variants.black.img;
+    const dpr=canvas.width/w;
+    const cover=Math.max(w/euro.h,h/euro.w)*1.04;
+    const nativeZoom=Math.min(source.naturalWidth/euro.w,source.naturalHeight/euro.h)/dpr;
+    const initialZoom=Math.min(cover*.88,nativeZoom);
+    if(elapsed<1000)zoom=initialZoom+(cover-initialZoom)*easeOut(progress(elapsed,0,1000));
+    else if(elapsed<timeline.hold)zoom=cover;
+    else zoom=cover+(fit-cover)*easeOut(progress(elapsed,timeline.hold,timeline.camera));
+  }
+  if(!euroIntroFinished&&(reduce.matches||elapsed>=cameraEnd)){
+    euroIntroFinished=true;
+    const item=items.find(item=>item.key==='€');
+    load(item,'black',true).then(()=>{reflectionDirty=true;}).catch(console.warn);
   }
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;

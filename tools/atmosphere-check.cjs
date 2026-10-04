@@ -20,7 +20,7 @@ const run=s=>vm.runInContext(s,sandbox);
   run('draw(45000)');assert.equal(run('backgroundIndex'),6);
   run('changeBackground(2);draw(45016)');assert.equal(run('backgroundIndex'),0);assert.equal(run('backgroundOrder[backgroundIndex]'),7);assert.match(html.style['--page-background'],/Background.jpg/);
   run('draw(60000);draw(60050);draw(60100)');assert(!classes.has('flash-active'));
-  assert.equal(run('timeline.hold'),1500);assert.equal(run('cameraEnd'),4500);assert.equal(run('introEnd'),7500);
+  assert.equal(run('timeline.hold'),2000);assert.equal(run('cameraEnd'),5000);assert.equal(run('introEnd'),8000);
   assert.equal(run('items[0].variants.black.img===items[9].variants.black.img'),true);
   console.log('PASS: doubled intro, automatic changes at 20s then 15s, 250ms transition, manual cancellation, initial original photograph, no flash, shared images.');
   const dots=nodes.filter(n=>n.className?.startsWith('floating-dot'));assert.equal(dots.length,19);
