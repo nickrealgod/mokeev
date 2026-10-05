@@ -11,7 +11,10 @@ vm.createContext(sandbox);for(const file of ['letters','gradients','variations',
 const run=s=>vm.runInContext(s,sandbox);
 (async()=>{
   await new Promise(resolve=>setImmediate(resolve));
-  run('draw(0);draw(19999)');assert.equal(run('backgroundIndex'),0);
+  run('draw(0);draw(4999)');assert.equal(run('ready'),false);
+  run('draw(5000)');assert.equal(run('ready'),true);assert.equal(nav.style.opacity,'0');
+  run('draw(6500)');assert(+nav.style.opacity>0&&+nav.style.opacity<1);
+  run('draw(19999)');assert.equal(run('backgroundIndex'),0);
   run('draw(20000)');assert.equal(run('backgroundIndex'),4);assert(run('backgroundTransition!==null'));
   run('draw(20125)');assert(run('backgroundTransition!==null'));
   run('draw(20250)');assert.equal(run('backgroundTransition'),null);

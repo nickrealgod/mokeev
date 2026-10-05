@@ -14,7 +14,7 @@ const introEnd = iconsEnd;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
 let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
-let scenePainted=false,euroIntroFinished=false;
+let scenePainted=false;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
 const backgroundOrder=[7,6,5,1,2,3,4,0];
 const backgrounds=[
@@ -77,10 +77,11 @@ function paintBackground(index,camera){
     const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
     if(!iw||!ih){ctx.fillStyle='#f7fafe';ctx.fillRect(0,0,w,h);return;}
     const scale=Math.max(w/iw,h/ih);
-    // The photo occupies fixed world coordinates, just like letters and reflection.
+    // Fixed photo coordinates in the same scene as the lettering and reflection.
     ctx.save();applyCamera(camera);
     ctx.drawImage(backgroundImage,center[0]-iw*scale/(2*fit),center[1]+(h/2-letteringY-ih*scale/2)/fit,iw*scale/fit,ih*scale/fit);
-    ctx.restore();return;
+    ctx.restore();
+    return;
   }
   if(identity===6){paintNoisyBackground();return;}
   if(!cachedBackground)cachedBackground=new Map();
@@ -102,7 +103,7 @@ const all = Object.values(data.letters).flatMap(v => Object.values(v));
 const bounds = { x:Math.min(...all.map(v=>v.x)), y:Math.min(...all.map(v=>v.y)), right:Math.max(...all.map(v=>v.x+v.w)), bottom:Math.max(...all.map(v=>v.y+v.h)) };
 const center=[(bounds.x+bounds.right)/2,(bounds.y+bounds.bottom)/2];
 const baseline=Math.max(...order.slice(0,6).map(key=>data.letters[key].black.y+data.letters[key].black.h));
-const euro=data.letters['€'].black, focus=[euro.x+euro.w*.6,euro.y+euro.h/2];
+const euro=data.letters['€'].black, focus=[euro.x+euro.w*.5,euro.y+euro.h*.5];
 nav.inert = true;
 function resize() {
   w=innerWidth; h=innerHeight;cachedBackground=null;reflectionFade=null;reflectionDirty=true;
@@ -118,18 +119,16 @@ function resize() {
 addEventListener('resize', resize); resize();
 // Share decoded images and hit masks when multiple letters use the same asset.
 const imageCache=new Map(),maskCache=new Map();
-async function load(item, style, standard=false) {
+async function load(item, style) {
   const info=data.letters[item.key][style];
-  const src=item.key==='€' && style==='black' && !standard ? 'assets/letters/black/euro-intro.png' : info.src;
+  const src=item.key==='€' && style==='black' ? 'assets/letters/black/euro-psd.png' : info.src;
   if(!imageCache.has(src)){
     const img=new Image();img.decoding='async';img.src=src;
     imageCache.set(src,img.decode().then(()=>img).catch(error=>{imageCache.delete(src);throw error;}));
   }
   const img=await imageCache.get(src);
   if(!maskCache.has(info.mask))maskCache.set(info.mask,Uint8Array.from(atob(info.mask),c=>c.charCodeAt(0)));
-  const introEuro=item.key==='€'&&style==='black'&&!standard;
-  const width=introEuro?info.h*img.naturalWidth/img.naturalHeight:info.w;
-  item.variants[style]={...info,x:info.x+(info.w-width)/2,w:width,img,alpha:maskCache.get(info.mask)};
+  item.variants[style]={...info,img,alpha:maskCache.get(info.mask)};
 }
 function apply(item, style, gradient) {
   item.style=style; item.gradient=gradient; item.surface=null;reflectionDirty=true;
@@ -294,7 +293,7 @@ function draw(now) {
   const turn=progress(elapsed,2000,timeline.camera);
   const ease=turn*turn*(3-2*turn);
   const iconEase=easeOut(progress(elapsed,cameraEnd,timeline.icons));
-  if((reduce.matches||elapsed>=introEnd)&&!ready){
+  if((reduce.matches||elapsed>=cameraEnd)&&!ready){
     ready=true;nav.inert=false;document.body.classList.add('ready');
     document.querySelectorAll('#keyboard button').forEach(b=>b.disabled=false);
   }
@@ -310,16 +309,23 @@ function draw(now) {
     else if(elapsed<timeline.hold)zoom=cover;
     else zoom=cover+(fit-cover)*easeOut(progress(elapsed,timeline.hold,timeline.camera));
   }
-  if(!euroIntroFinished&&(reduce.matches||elapsed>=cameraEnd)){
-    euroIntroFinished=true;
-    const item=items.find(item=>item.key==='€');
-    load(item,'black',true).then(()=>{reflectionDirty=true;}).catch(console.warn);
-  }
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
   ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
-  const camera={y:h*.5*(1-ease)+letteringY*ease,angle,zoom,cx,cy};
-  ctx.fillStyle="#f7fafe";ctx.fillRect(0,0,w,h);
+  const camera={now,y:h*.5*(1-ease)+letteringY*ease,angle,zoom,cx,cy};
+  if(elapsed<cameraEnd&&backgroundImage.naturalWidth){
+    // Keep all four viewport corners inside the photo by scaling the entire scene.
+    const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
+    const scale=Math.max(w/iw,h/ih),bx=center[0],by=center[1]+(h/2-letteringY)/fit;
+    const halfW=iw*scale/(2*fit),halfH=ih*scale/(2*fit);
+    const c=Math.cos(angle),sn=Math.sin(angle);
+    for(const x of [0,w])for(const y of [0,h]){
+      const sx=x-w/2,sy=y-camera.y,qx=sx*c+sy*sn,qy=-sx*sn+sy*c;
+      const mx=halfW-(qx>=0?cx-bx:bx-cx),my=halfH-(qy>=0?cy-by:by-cy);
+      if(mx>0&&my>0)camera.zoom=Math.max(camera.zoom,Math.abs(qx)/mx,Math.abs(qy)/my);
+    }
+  }
+  ctx.fillStyle="#808088";ctx.fillRect(0,0,w,h);
   renderBackground(now,camera);
   if(iconEase!==lastIconEase){
     nav.style.opacity=String(iconEase);nav.style.visibility=iconEase>0?'visible':'hidden';
