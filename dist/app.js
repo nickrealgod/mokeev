@@ -28,7 +28,7 @@ const backgrounds=[
 ];
 let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=true;
 let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
-const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg?v=b7f655fa';
+const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg?v=c488a790';
 const backgroundReady=backgroundImage.decode().catch(error=>console.warn('Background unavailable',error));
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
@@ -51,7 +51,7 @@ function paintNoisyBackground(){
 }
 function syncPageBackground(){
   if(backgroundOrder[backgroundIndex]===7){
-    document.documentElement.style.setProperty('--page-background','url("assets/Background.jpg?v=b7f655fa") center / cover no-repeat #f7fafe');
+    document.documentElement.style.setProperty('--page-background','url("assets/Background.jpg?v=c488a790") center / cover no-repeat #f7fafe');
     document.querySelector('meta[name="theme-color"]').content='#f7fafe';return;
   }
   const stops=backgrounds[backgroundOrder[backgroundIndex]];
@@ -291,7 +291,7 @@ function draw(now) {
   const elapsed=now-start;
   advanceBackground(now);
   const turn=progress(elapsed,2000,timeline.camera);
-  const ease=turn*turn*(3-2*turn);
+  const ease=turn*turn*turn*(turn*(turn*6-15)+10);
   const iconEase=easeOut(progress(elapsed,cameraEnd,timeline.icons));
   if((reduce.matches||elapsed>=cameraEnd)&&!ready){
     ready=true;nav.inert=false;document.body.classList.add('ready');
@@ -307,7 +307,7 @@ function draw(now) {
     const initialZoom=Math.min(cover*.88,nativeZoom);
     if(elapsed<1000)zoom=initialZoom+(cover-initialZoom)*easeOut(progress(elapsed,0,1000));
     else if(elapsed<timeline.hold)zoom=cover;
-    else zoom=cover+(fit-cover)*easeOut(progress(elapsed,timeline.hold,timeline.camera));
+    else zoom=cover*Math.exp(Math.log(fit/cover)*ease);
   }
   const angle=(1-ease)*Math.PI/2;
   const cx=focus[0]*(1-ease)+center[0]*ease,cy=focus[1]*(1-ease)+center[1]*ease;
@@ -319,10 +319,17 @@ function draw(now) {
     const scale=Math.max(w/iw,h/ih),bx=center[0],by=center[1]+(h/2-letteringY)/fit;
     const halfW=iw*scale/(2*fit),halfH=ih*scale/(2*fit);
     const c=Math.cos(angle),sn=Math.sin(angle);
+    // A smooth upper envelope avoids a velocity kink when photo coverage takes over.
+    // Its margin vanishes with zero velocity at both ends of the turn.
+    const margin=fit*.18*Math.sin(Math.PI*turn)**2;
+    const includeScale=required=>{
+      const delta=camera.zoom-required;
+      camera.zoom=(camera.zoom+required+Math.hypot(delta,margin))/2;
+    };
     for(const x of [0,w])for(const y of [0,h]){
       const sx=x-w/2,sy=y-camera.y,qx=sx*c+sy*sn,qy=-sx*sn+sy*c;
       const mx=halfW-(qx>=0?cx-bx:bx-cx),my=halfH-(qy>=0?cy-by:by-cy);
-      if(mx>0&&my>0)camera.zoom=Math.max(camera.zoom,Math.abs(qx)/mx,Math.abs(qy)/my);
+      if(mx>0&&my>0){includeScale(Math.abs(qx)/mx);includeScale(Math.abs(qy)/my);}
     }
   }
   ctx.fillStyle="#808088";ctx.fillRect(0,0,w,h);
