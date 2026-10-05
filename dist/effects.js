@@ -31,6 +31,7 @@ window.SiteEffects=(()=>{
     if(!target&&!opacity)return;
     if(birth===null&&target)birth=now;
     opacity+=Math.sign(target-opacity)*Math.min(Math.abs(target-opacity),dt/800);
+    const t=(now-birth)/1000;
     for(const d of dots){
       const {dot}=d;
       if(d.lifeAt===null)d.lifeAt=now;
@@ -45,7 +46,6 @@ window.SiteEffects=(()=>{
       if(!opacity||birth===null)continue;
       if(d.exitAt!==null&&now-d.exitAt>=800){d.respawnAt=now+250+Math.random()*950;continue;}
       const {phases,speeds}=d;
-      const t=(now-birth)/1000;
       // Smooth wandering velocity, with stronger upward/rightward components.
       const vx=10*Math.sin(t*speeds[0]+phases[0])+5*Math.sin(t*speeds[1]+phases[1]);
       const vy=10*Math.sin(t*speeds[3]+phases[3])+5*Math.sin(t*speeds[4]+phases[4]);

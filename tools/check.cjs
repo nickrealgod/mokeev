@@ -18,7 +18,7 @@ for(const item of items){assert(V.options(item,'play').includes('play'));if(item
 assert.equal(sandbox.window.GRADIENTS.length,5);
 for(const g of sandbox.window.GRADIENTS){assert.equal(g.angle,48);assert.equal(g.scale,.91);}
 for(const item of items)for(const v of Object.values(item.variants))assert(fs.existsSync(root+'/'+v.src));
-assert(fs.existsSync(root+'/assets/letters/black/euro-original.png'));
+assert(fs.existsSync(root+'/assets/letters/black/euro-psd.png'));
 console.log('PASS: 20 six-step gradient cycles; five distinct gradients then unchanged; six shared scroll families; Alt/Play coverage; palette geometry; all assets.');
 
 for(let i=0;i<1000;i++) {const set=V.gradientSet(10);assert.equal(set.filter(g=>g===-1).length,2);assert(set.every((g,j)=>j===0||g!==set[j-1]));}

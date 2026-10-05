@@ -12,7 +12,7 @@ const cameraEnd = timeline.hold + timeline.camera;
 const iconsEnd = cameraEnd + timeline.icons;
 const introEnd = iconsEnd;
 const reflection=document.createElement('canvas'), reflectionCtx=reflection.getContext('2d');
-let w=innerWidth, h=innerHeight, fit=1, linksTop=0, start=null, ready=false;
+let w=innerWidth, h=innerHeight, fit=1, start=null, ready=false;
 let hover=null, focused=null, wheelDelta=0, scrollCycleIndex=0;
 let scenePainted=false;
 let raf=0, backgroundIndex=0, waveUntil=0, lastWheelEvent=0, lastWheelMagnitude=0, lastWheelDirection=null, wheelConsumed=false, letteringY=0,scrollShift=0;
@@ -30,6 +30,7 @@ let cachedBackground=null, reflectionFade=null, lastIconEase=-1,reflectionDirty=
 let backgroundTransition=null,autoBackground=true,nextAutoBackground=null,firstAutoBackground=true;
 const backgroundImage=new Image();backgroundImage.decoding='async';backgroundImage.src='assets/Background.jpg?v=c488a790';
 const backgroundReady=backgroundImage.decode().catch(error=>console.warn('Background unavailable',error));
+let photoCache=null;
 const noisyBackground=document.createElement('canvas');
 function paintNoisyBackground(){
   if(noisyBackground.width!==canvas.width||noisyBackground.height!==canvas.height){
@@ -77,6 +78,15 @@ function paintBackground(index,camera){
     const iw=backgroundImage.naturalWidth,ih=backgroundImage.naturalHeight;
     if(!iw||!ih){ctx.fillStyle='#f7fafe';ctx.fillRect(0,0,w,h);return;}
     const scale=Math.max(w/iw,h/ih);
+    // After the intro the photograph is static: resample once per viewport size.
+    if(ready){
+      if(!photoCache){
+        photoCache=document.createElement('canvas');photoCache.width=canvas.width;photoCache.height=canvas.height;
+        const pc=photoCache.getContext('2d');pc.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
+        pc.drawImage(backgroundImage,(w-iw*scale)/2,(h-ih*scale)/2,iw*scale,ih*scale);
+      }
+      ctx.drawImage(photoCache,0,0,w,h);return;
+    }
     // Fixed photo coordinates in the same scene as the lettering and reflection.
     ctx.save();applyCamera(camera);
     ctx.drawImage(backgroundImage,center[0]-iw*scale/(2*fit),center[1]+(h/2-letteringY-ih*scale/2)/fit,iw*scale/fit,ih*scale/fit);
@@ -112,9 +122,7 @@ function resize() {
   canvas.width=Math.round(w*dpr); canvas.height=Math.round(h*dpr);
   fit=w>h ? w*.86/(bounds.right-bounds.x) : Math.min(w*.96/(bounds.right-bounds.x),h*.48/(bounds.bottom-bounds.y));
   letteringY=h*.5-(baseline-center[1])*fit;
-  const top=letteringY+(bounds.y-center[1])*fit;
-  linksTop=Math.max(60,top/2);
-  document.body.style.setProperty('--links-top',`${linksTop}px`);
+  photoCache=null;
 }
 addEventListener('resize', resize); resize();
 // Share decoded images and hit masks when multiple letters use the same asset.
@@ -123,7 +131,7 @@ async function load(item, style) {
   const info=data.letters[item.key][style];
   const src=item.key==='€' && style==='black' ? 'assets/letters/black/euro-psd.png' : info.src;
   if(!imageCache.has(src)){
-    const img=new Image();img.decoding='async';img.src=src;
+    const img=new Image();img.decoding='async';img.src=src+'?v=psd-bicubic-20261005';
     imageCache.set(src,img.decode().then(()=>img).catch(error=>{imageCache.delete(src);throw error;}));
   }
   const img=await imageCache.get(src);
