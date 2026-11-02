@@ -257,6 +257,7 @@ canvas.addEventListener('pointerup',e=>{
   if(g.type!=='mouse'){traceTouch(g,e.clientX,e.clientY);if(g.brushing)return;}
   const dx=e.clientX-g.x,dy=e.clientY-g.y;
   if(Math.hypot(dx,dy)>=24){if(g.type!=='mouse'){if(Math.abs(dy)>Math.abs(dx))window.SiteEffects.scrollImpulse(-dy);changeAll(gestureDirection(dx,dy));}}
+  else if(g.item&&g.item.key==='*')window.location.assign('/palette/');
   else if(g.item&&g.type!=='mouse')change(g.item);
   else changeBackground(e.clientX<w/2?-1:1);
 });
@@ -284,8 +285,8 @@ addEventListener('wheel',e=>{
 },{passive:false});
 items.forEach(item=>{
   const button=document.createElement('button');
-  button.textContent=`Change ${item.key==='M2'?'last M':item.key} style`;button.disabled=true;
-  button.addEventListener('click',()=>change(item));
+  button.textContent=item.key==='*'?'Open OKLCH palette':`Change ${item.key==='M2'?'last M':item.key} style`;button.disabled=true;
+  button.addEventListener('click',()=>item.key==='*'?window.location.assign('/palette/'):change(item));
   button.addEventListener('focus',()=>focused=item);button.addEventListener('blur',()=>focused=null);
   document.querySelector('#keyboard').append(button);
 });
