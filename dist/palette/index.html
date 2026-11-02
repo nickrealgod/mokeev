@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OKLCH palette</title><style>:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111;background:#fff;font-synthesis:none}*{box-sizing:border-box}body{margin:0}input,select{font:inherit}input,select,summary{-webkit-tap-highlight-color:transparent}.page-controls{background:#fff;padding:64px 40px 32px}.controls-inner,.theme-inner{max-width:1120px;margin:0 auto}.page-title{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:34px}h1{margin:0;font-size:30px;font-weight:550;letter-spacing:-1px}.page-title p{margin:0;font-size:12px;color:#777}.inputs{display:flex;align-items:flex-start;gap:32px}.inputs label{display:block;margin-bottom:9px;font-size:11px;color:#777}.hex-input{display:flex;align-items:center;gap:12px}#picker{height:34px;width:34px;border:0;padding:0;background:none;cursor:pointer}#picker::-webkit-color-swatch-wrapper{padding:0}#picker::-webkit-color-swatch{border:none;border-radius:0}#hex{border:0;border-bottom:1px solid #ddd;border-radius:0;background:#fff;color:#111;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:21px;letter-spacing:.2px;padding:2px 0 5px;width:150px;outline:none}#hex:focus{border-color:#111}#hex[aria-invalid=true]{border-color:#b32d2d}select{height:34px;border:0;border-bottom:1px solid #ddd;background:#fff;color:#111;border-radius:0;padding:0 25px 0 0;min-width:185px;font-size:14px}#error{margin:12px 0 0;font-size:12px;color:#b32d2d;min-height:0}#error:empty{display:none}#base-hue{font-size:11px;color:#777;margin:16px 0 0}.settings{margin-top:18px;font-size:11px;line-height:1.8;color:#777;max-width:730px}.settings summary{cursor:pointer;display:inline-block}.settings p{margin:12px 0}.settings label{color:#555}#gray-hue-label{font-size:12px;display:block;margin:12px 0}#gray-hue{width:70px;padding:4px;border:1px solid #ddd}.theme-section{padding:40px 40px 72px}.light-section{background:#fff;color:#111}.dark-section{background:#000;color:#fff}h2{font-size:17px;font-weight:500;letter-spacing:-.3px;margin:0 0 26px}.table-scroll{overflow-x:auto}table{width:100%;border-collapse:separate;border-spacing:0 16px;table-layout:fixed;margin-top:-16px}td{padding:0;vertical-align:middle;height:64px;border:0;text-align:left}.sample-col{width:96px}.function-col{width:190px}.hex-col{width:130px}.oklch-col{width:390px}.max-col{width:100px}.swatch{width:64px;height:64px;border:0;border-radius:0}.family-name{display:block;color:#858585;font-size:11px;margin-bottom:5px}.function-name{display:block;font-size:13px;font-weight:450}.hex-value,.oklch-value,.max-value{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}.hex-value,.oklch-value{user-select:all}.max-value{color:#666}.dark-section .max-value{color:#aaa}.dark-section .family-name{color:#888}.max-swatch{cursor:default}input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #777;outline-offset:4px}[hidden]{display:none!important}@media(max-width:1000px){.page-controls{padding:40px 24px 24px}.theme-section{padding:32px 24px 56px}table{min-width:630px}.sample-col{width:80px}.function-col{width:100px}.hex-col{width:80px}.oklch-col{width:218px}.max-col{width:72px}.hex-value,.oklch-value,.max-value{font-size:11px}.page-title{align-items:flex-start}}@media(max-width:560px){.page-controls{padding:28px 20px 22px}.theme-section{padding:30px 20px 48px}.page-title{display:block;margin-bottom:26px}.page-title p{margin-top:10px}.inputs{gap:22px;flex-wrap:wrap}h1{font-size:27px}#hex{width:130px;font-size:19px}select{min-width:160px;font-size:13px}.hex-value,.oklch-value,.max-value{font-size:11px}}
+
+.divider-col{width:28px}.color-divider{width:2px;height:64px}.page-controls{padding-top:40px}@media(max-width:1000px){table{min-width:658px}.divider-col{width:28px}}
+</style></head>
+<body>
+<header class="page-controls">
+  <div class="controls-inner">
+    <div class="inputs">
+      <div class="hex-control"><label for="hex">Base HEX</label><div class="hex-input"><input type="color" id="picker" value="#EF3340" aria-label="Выбрать базовый цвет"><input id="hex" value="#EF3340" maxlength="7" spellcheck="false" aria-describedby="error base-hue"></div></div>
+      <div class="neutral-control"><label for="neutral">Neutral hue</label><select id="neutral" aria-label="Оттенок нейтральных"></select></div>
+    </div>
+    <p id="error" role="status"></p><p id="base-hue"></p>
+    <label id="gray-hue-label" hidden>Опорный RGB Hue <input id="gray-hue" type="number" min="0" max="359" value="0"></label>
+
+  </div>
+</header>
+<main>
+  <section class="theme-section light-section" aria-labelledby="light-title"><div class="theme-inner"><h2 id="light-title">Light theme</h2><div class="table-scroll"><table aria-label="Палитра светлой темы: образец, функция, цветной разделитель, HEX, OKLCH, образец MAX, максимальная Chroma"><colgroup><col class="sample-col"><col class="function-col"><col class="divider-col"><col class="hex-col"><col class="oklch-col"><col class="sample-col"><col class="max-col"></colgroup><tbody id="light-rows"></tbody></table></div></div></section>
+  <section class="theme-section dark-section" aria-labelledby="dark-title"><div class="theme-inner"><h2 id="dark-title">Dark theme</h2><div class="table-scroll"><table aria-label="Палитра тёмной темы: образец, функция, цветной разделитель, HEX, OKLCH, образец MAX, максимальная Chroma"><colgroup><col class="sample-col"><col class="function-col"><col class="divider-col"><col class="hex-col"><col class="oklch-col"><col class="sample-col"><col class="max-col"></colgroup><tbody id="dark-rows"></tbody></table></div></div></section>
+</main>
+<script>const mod=x=>(x%360+360)%360;
+const anchors=[[0,0],[60,30],[120,60],[180,120],[240,240],[300,270],[360,360]];
+function mapHue(h,inverse=false){h=mod(h);const a=anchors.map(p=>inverse?[p[1],p[0]]:p);for(let i=1;i<a.length;i++)if(h<=a[i][0])return a[i-1][1]+(h-a[i-1][0])/(a[i][0]-a[i-1][0])*(a[i][1]-a[i-1][1]);}
+function hslRgb(h,s=1,l=.5){const a=s*Math.min(l,1-l);return [0,8,4].map(n=>{const k=(n+h/30)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1));});}
+function rgbHue(rgb){const max=Math.max(...rgb),min=Math.min(...rgb),d=max-min;if(d<1e-9)return null;let h=max===rgb[0]?(rgb[1]-rgb[2])/d:max===rgb[1]?(rgb[2]-rgb[0])/d+2:(rgb[0]-rgb[1])/d+4;return mod(h*60);}
+function toOklch(rgb){const [r,g,b]=rgb.map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);const l=Math.cbrt(.4122214708*r+.5363325363*g+.0514459929*b),m=Math.cbrt(.2119034982*r+.6806995451*g+.1073969566*b),s=Math.cbrt(.0883024619*r+.2817188376*g+.6299787005*b);const L=.2104542553*l+.793617785*m-.0040720468*s,a=1.9779984951*l-2.428592205*m+.4505937099*s,bb=.0259040371*l+.7827717662*m-.808675766*s;return [L,Math.hypot(a,bb),mod(Math.atan2(bb,a)*180/Math.PI)];}
+function linearRgb(L,C,H){const a=C*Math.cos(H*Math.PI/180),b=C*Math.sin(H*Math.PI/180),l=(L+.3963377774*a+.2158037573*b)**3,m=(L-.1055613458*a-.0638541728*b)**3,s=(L-.0894841775*a-1.291485548*b)**3;return [4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.707614701*s];}
+function inGamut(L,C,H){return linearRgb(L,C,H).every(v=>v>=0&&v<=1);}
+function maxChroma(L,H){let lo=0,hi=.5;for(let i=0;i<38;i++){const mid=(lo+hi)/2;if(inGamut(L,mid,H))lo=mid;else hi=mid;}return Math.floor(lo*1e6)/1e6;}
+function hexFor(L,C,H){return '#'+linearRgb(L,C,H).map(v=>{v=Math.max(0,Math.min(1,v));return Math.round(255*(v<=.0031308?12.92*v:1.055*v**(1/2.4)-.055)).toString(16).padStart(2,'0');}).join('').toUpperCase();}
+function correction(base,h){const within=(v,a,b)=>v>=a&&v<b;let target=null,delta=0;if([0,60,180,240,300].some(a=>within(base,a,a+20))){target=120;delta=-30;}else if([20,80,140,200,260].some(a=>within(base,a,a+20))){target=320;delta=30;}else if(within(base,320,340)){target=260;delta=90;}else if(within(base,120,140)){target=180;delta=-90;}return target!==null&&within(h,target,target+20)?delta:0;}
+// Mathematical reconstruction of the public Paletton color.wheel mapping.
+// Source: https://paletton.com/js/app.compiled.js (color.wheel / color.class).
+// Continuous angles and channels avoid the original UI's integer quantization.
+const palettonSectors=[
+  {end:120,origin:120,span:-120,k:.5,order:[0,1,2],s0:1,s1:1,v0:1,v1:1,reverse:false},
+  {end:180,origin:120,span:60,k:.5,order:[1,0,2],s0:1,s1:1,v0:1,v1:.8,reverse:true},
+  {end:210,origin:210,span:-30,k:.75,order:[2,0,1],s0:1,s1:1,v0:.8,v1:.6,reverse:false},
+  {end:255,origin:210,span:45,k:1.33,order:[2,1,0],s0:1,s1:.85,v0:.6,v1:.7,reverse:true},
+  {end:315,origin:315,span:-60,k:1.33,order:[1,2,0],s0:.85,s1:1,v0:.7,v1:.65,reverse:false},
+  {end:360,origin:315,span:45,k:1.33,order:[0,2,1],s0:1,s1:1,v0:.65,v1:1,reverse:true}
+];
+function palettonSector(h){return palettonSectors.find(x=>h<x.end);}
+function palettonFraction(h){
+  h=mod(h);if(h===0||h===180||h===255)return 0;
+  const p=palettonSector(h);return 1/(1+p.k*Math.tan((h-p.origin)/p.span*Math.PI/2));
+}
+function palettonRgb(h,s=1,v=1){
+  h=mod(h);const p=palettonSector(h),low=v*(1-s),mid=low+v*s*palettonFraction(h);
+  const channels=[v,mid,low];return p.order.map(i=>channels[i]);
+}
+function palettonAngle(rgb){
+  const max=Math.max(...rgb),min=Math.min(...rgb);if(max===min)return null;
+  const [r,g,b]=rgb;
+  const i=max===r?(min===b?0:5):max===g?(min===r?2:1):(min===r?3:4);
+  const mid=i===0?g:i===1?r:i===2?b:i===3?g:i===4?r:b;
+  if(mid===min)return i===0||i===5?0:i===1||i===2?180:255;
+  const p=palettonSectors[i],ratio=(max-mid)/(mid-min);
+  return mod(p.origin+p.span*2/Math.PI*Math.atan(ratio/p.k));
+}
+function palettonBaseSV(h){
+  h=mod(h);const p=palettonSector(h);let f=palettonFraction(h);if(p.reverse)f=1-f;
+  return [p.s0+(p.s1-p.s0)*f,p.v0+(p.v1-p.v0)*f];
+}
+function generateHues(rgb,{adjust=false,fallback=0}={}){
+  const achromatic=rgbHue(rgb)===null;
+  const source=achromatic?hslRgb(mod(fallback)):rgb;
+  const original=toOklch(source),base=palettonAngle(source),M=Math.max(...source),m=Math.min(...source);
+  const S=(M-m)/M,V=M,[bs,bv]=palettonBaseSV(base);
+  const coefficient=(reference,value)=>value<=reference?value/reference:1+(value-reference)/(1-reference);
+  const ks=coefficient(bs,S),kv=coefficient(bv,V);
+  const apply=(reference,k)=>k<=1?reference*k:reference+(1-reference)*(k-1);
+  return Array.from({length:6},(_,i)=>{
+    const raw=mod(base+i*60),[s,v]=palettonBaseSV(raw);
+    const before=i===0?original[2]:toOklch(palettonRgb(raw,apply(s,ks),apply(v,kv)))[2];
+    const delta=adjust?correction(original[2],before):0;
+    return {raw,delta,before,h:mod(before+delta)};
+  });
+}
+const colorFamilies=[{name:'Red',h:23.5,fill:.0103},{name:'Orange',h:78,fill:.0167},{name:'Yellow',h:108.6,fill:.0707},{name:'Green',h:141,fill:.027},{name:'Blue',h:262,fill:.0064},{name:'Purple',h:308.7,fill:.0103}];
+function colorFamily(h){return colorFamilies.reduce((a,b)=>Math.abs(mod(b.h-h+180)-180)<Math.abs(mod(a.h-h+180)-180)?b:a);}
+const neutralNames=['Background','Blocks','Panel','Dividers','Borders','Secondary text','Primary text','Extra contrast'];
+const neutralLightness={light:[.927,1,.983,.927,.809,.5,.309,.191],dark:[.191,.236,.264,.427,.5,.809,.983,1]};
+function neutralRecipe(theme,h){return neutralLightness[theme].map((L,i)=>({role:neutralNames[i],L,C:theme==='dark'||i<2?0:.0064,H:theme==='dark'||i<2?0:h}));}
+function colorRecipe(theme,h,fine=true){
+  const family=colorFamily(h),warm=family.name==='Orange'||family.name==='Yellow';
+  return theme==='dark'?
+    [{role:'Tinted info',L:.809,C:.0707,H:h},{role:'Colorful',L:.691,C:.158,H:h},{role:'Alerts',L:.264,C:.0437,H:h}]:
+    [{role:'Tinted info',L:.5,C:.1143,H:h},{role:'Colorful',L:!fine&&warm?.691:.573,C:!fine&&warm?.158:.185,H:h},{role:'Alerts',L:.983,C:family.fill,H:h}];
+}
+function colorValues(L,C,H){const max=maxChroma(L,H),mapped=Math.min(C,max);return {L,C,H,max,mapped,outside:C>max+1e-6,hex:hexFor(L,mapped,H)};}
+if(typeof module!=='undefined')module.exports={mod,mapHue,hslRgb,rgbHue,toOklch,linearRgb,inGamut,maxChroma,hexFor,correction,palettonAngle,palettonRgb,palettonBaseSV,generateHues,colorFamily,neutralRecipe,colorRecipe,colorValues};
+</script><script>const $=s=>document.querySelector(s);
+const fmt=(n,p=6)=>Number(n.toFixed(p)).toString();
+const ok=(L,C,H)=>`oklch(${fmt(L)} ${fmt(C)} ${fmt(H,4)})`;
+function tokenRow({role,L,C,H},family='Neutral'){
+  const v=colorValues(L,C,H),maxHex=hexFor(L,v.max,H),row=document.createElement('tr');
+  row.dataset.l=L;row.dataset.c=C;row.dataset.h=H;
+  const gamutNote=v.outside?`Исходная Chroma ${fmt(C)} вне sRGB. Для HEX использована ${fmt(v.mapped)}; Lightness и Hue сохранены.`:'Цвет в пределах sRGB';
+  row.innerHTML=`<td aria-label="Образец цвета"><div class="swatch" style="background:${v.hex}" role="img" aria-label="${family} ${role}: ${v.hex}" title="${gamutNote}"></div></td><td aria-label="Функция"><span class="family-name">${family}</span><span class="function-name">${role}</span></td><td class="divider-cell" aria-label="Цветной разделитель"><div class="color-divider" style="background:${v.hex}"></div></td><td class="hex-value" aria-label="HEX" title="${gamutNote}">${v.hex}</td><td class="oklch-value" aria-label="OKLCH">${ok(L,C,H)}</td><td aria-label="Цвет с максимальной Chroma"><div class="swatch max-swatch" style="background:${maxHex}" role="img" aria-label="${family} ${role}, maximum Chroma: ${maxHex}" title="${ok(L,v.max,H)} · ${maxHex}"></div></td><td class="max-value" aria-label="Максимальная Chroma">${fmt(v.max)}</td>`;
+  return row;
+}
+function render(){
+  let value=$('#hex').value.trim();
+  if(!/^#?(?:[a-f\d]{3}|[a-f\d]{6})$/i.test(value)){$('#error').textContent='Введите HEX: #EF3340 или #ABC';$('#hex').setAttribute('aria-invalid','true');return;}
+  $('#error').textContent='';$('#hex').removeAttribute('aria-invalid');value=value.replace('#','');if(value.length===3)value=[...value].map(c=>c+c).join('');
+  const rgb=value.match(/../g).map(v=>parseInt(v,16)/255);$('#picker').value='#'+value;
+  const selected=$('#neutral').value||'4',rgbH=rgbHue(rgb),original=toOklch(rgb);
+  const hues=generateHues(rgb,{fallback:Number($('#gray-hue').value)||0}).map(x=>({...x,family:colorFamily(x.h)}));
+  $('#neutral').innerHTML=hues.map((x,i)=>`<option value="${i}" ${i==selected?'selected':''}>${x.family.name} · ${fmt(x.h,1)}°</option>`).join('');
+  $('#base-hue').textContent=rgbH===null?'Hue не определён — выберите опорный угол':`Base hue ${fmt(original[2],2)}° · Paletton RYB ${fmt(hues[0].raw,2)}°`;
+  $('#gray-hue-label').hidden=rgbH!==null;
+  const H=hues[Number(selected)].h;
+  for(const theme of ['light','dark']){
+    const rows=neutralRecipe(theme,H).map(v=>tokenRow(v));
+    for(const hue of hues)rows.push(...colorRecipe(theme,hue.h,false).map(v=>tokenRow(v,hue.family.name)));
+    $(`#${theme}-rows`).replaceChildren(...rows);
+  }
+}
+$('#hex').addEventListener('input',render);
+$('#hex').addEventListener('blur',()=>{if(!$('#hex').hasAttribute('aria-invalid'))$('#hex').value=$('#picker').value.toUpperCase();});
+$('#picker').oninput=e=>{$('#hex').value=e.target.value.toUpperCase();render();};
+$('#neutral').onchange=render;$('#gray-hue').oninput=render;
+render();
+</script>
+</body></html>
