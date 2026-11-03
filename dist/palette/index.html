@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OKLCH palette</title><style>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OKLCH palette</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;display=swap"><style>
 :root {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-family: Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
   color: #141414;
   background: var(--page-blocks, #fff);
   --panel: #f9f9f9;
@@ -14,14 +14,17 @@
   --line: #636363;
 }
 * { box-sizing: border-box; }
-body { margin: 0; }
+body { margin: 0; min-height: 100dvh; display: flex; flex-direction: column; }
+#palette-footer { margin-top: 64px; min-height: 32px; flex: 1; }
+button { letter-spacing: .015em; }
+code { font-family: inherit; }
 button, input, summary { font: inherit; }
 button, summary { cursor: pointer; }
 :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 [hidden] { display: none !important; }
 .page-controls, #matrix { padding-inline: 40px; }
 .page-controls { padding-top: 40px; }
-#matrix { padding-block: 32px 64px; }
+#matrix { padding-block: 32px 0; min-width: 0; }
 .controls-inner, .theme-inner { max-width: 1120px; margin-inline: auto; }
 .inputs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .hex-control { position: relative; margin-right: 12px; }
@@ -34,19 +37,19 @@ button, summary { cursor: pointer; }
   border: 1px solid var(--line);
   border-radius: 12px;
 }
-#input-swatch { width: 24px; height: 24px; border-radius: 6px; flex: none; }
+#hsl-toggle { width: 28px; height: 28px; border: 0; border-radius: 6px; flex: none; }
 #hex {
   width: 8ch;
   border: 0;
   background: transparent;
   color: inherit;
-  font: 19px ui-monospace, monospace;
+  font-size: 19px;
 }
 #hex[aria-invalid="true"], #error { color: var(--control-ink, currentColor); }
 #error:empty { display: none; }
 #gray-hue-label, #error { font-size: 13px; }
 #gray-hue { width: 6ch; }
-#hsl-toggle, .theme-toggle, .downloads summary {
+.theme-toggle, .downloads summary {
   display: grid;
   place-items: center;
   width: 44px;
@@ -65,7 +68,6 @@ button, summary { cursor: pointer; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-#hsl-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
 .hsl-panel, .download-options, .color-hint {
   background: var(--panel);
   box-shadow: 0 10px 32px #0003;
@@ -99,7 +101,7 @@ button, summary { cursor: pointer; }
   pointer-events: none;
 }
 .picker-hue-label { display: block; margin-block: 10px 6px; font-size: 11px; }
-#picker-hue {
+.hsl-panel input[type="range"] {
   display: block;
   width: 100%;
   height: 12px;
@@ -108,7 +110,7 @@ button, summary { cursor: pointer; }
   appearance: none;
   background: linear-gradient(to right, red, #ff0, #0f0, #0ff, #00f, #f0f, red);
 }
-#picker-hue::-webkit-slider-thumb {
+.hsl-panel input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 15px;
   height: 15px;
@@ -117,19 +119,7 @@ button, summary { cursor: pointer; }
   background: transparent;
   box-shadow: 0 0 0 1px #0005;
 }
-#picker-hue::-moz-range-thumb { border: 2px solid #fff; border-radius: 50%; background: transparent; }
-.hsl-fields { display: flex; gap: 10px; font-size: 12px; }
-.hsl-fields label { flex: 1; min-width: 0; }
-.hsl-fields input {
-  display: block;
-  width: 100%;
-  margin-top: 5px;
-  padding: 7px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  color: inherit;
-  background: transparent;
-}
+.hsl-panel input[type="range"]::-moz-range-thumb { border: 2px solid #fff; border-radius: 50%; background: transparent; }
 .neutral-control { border: 0; padding: 0; margin: 0; min-width: 0; }
 .neutral-options { display: grid; grid-template-columns: repeat(6, 48px); gap: 6px; }
 .hue-option { position: relative; cursor: pointer; }
@@ -148,32 +138,30 @@ button, summary { cursor: pointer; }
 .downloads summary::-webkit-details-marker { display: none; }
 .download-options { right: 0; padding: 4px; }
 .download-options button { border: 0; padding: 10px 14px; background: transparent; color: inherit; }
-h2 { font-size: 17px; margin: 0; }
-#blocks-label { font-size: 12px; margin-block: 8px 14px; }
 .matrix-scroll { overflow-x: auto; }
 .matrix-table {
   width: 100%;
   min-width: 680px;
-  border-spacing: 6px;
+  border-spacing: 6px 16px;
   table-layout: fixed;
 }
 .matrix-table td { text-align: center; vertical-align: middle; padding: 0; }
-.matrix-function { font-size: 12px; line-height: 1.3; }
-.hint-anchor { display: grid; gap: 4px; --preview: var(--sample); }
+.matrix-table .matrix-function { padding-top: 6px; font-size: 12px; line-height: 16px; }
+.hint-anchor { display: grid; gap: 8px; --preview: var(--sample); }
 .matrix-swatch {
   width: 100%;
-  min-height: 44px;
-  padding: 8px;
+  min-height: 28px;
+  padding: 6px;
   border: 1px solid var(--preview);
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: 11px;
 }
 .sample-outline { background: transparent; color: var(--preview); }
 .sample-filled { background: var(--preview); color: var(--sample-ink); }
 .matrix-swatch:focus-visible { outline-color: var(--control-ink); outline-offset: -3px; }
-.hint-anchor.pinned, .hint-anchor:has(button:focus-visible) { --preview: var(--sample-max); }
+.hint-anchor.saturated { --preview: var(--sample-max); }
 @media (hover: hover) {
-  .hint-anchor:has(button:hover) { --preview: var(--sample-max); }
+  .hint-anchor:not(.preview-paused):has(button:hover) { --preview: var(--sample-max); }
   .hint-anchor:hover .color-hint { display: block; }
 }
 .color-hint {
@@ -199,20 +187,29 @@ h2 { font-size: 17px; margin: 0; }
   .neutral-options { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
   .hue-option span { height: 44px; }
 }
+
+.hsl-panel { border: 0; outline: 1px solid var(--line); }
+
+.hint-colors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.hint-colors span { display: block; width: 100%; aspect-ratio: 2 / 1; border-radius: 4px; }
+.hint-colors code { display: block; }
+.color-hint [data-level="Below AA"] { color: var(--wcag-red); }
+.color-hint [data-level="AA"] { color: var(--wcag-yellow); }
+.color-hint [data-level="AAA"] { color: var(--wcag-green); }
+.matrix-function { color: var(--function-ink); }
+
+.matrix-table td:nth-child(3):not([colspan]) { padding-left: 26px; }
 </style></head>
 <body>
 <header class="page-controls">
   <div class="controls-inner">
     <div class="inputs">
-      <div class="hex-control"><div class="hex-input"><span id="input-swatch"></span><input id="hex" aria-label="Base HEX" value="#EF3340" maxlength="7" spellcheck="false" aria-describedby="error"><button id="hsl-toggle" type="button" aria-expanded="false" aria-controls="hsl-panel" aria-label="HSL color picker"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 7 9 10 9-10"/></svg></button></div>
+      <div class="hex-control"><div class="hex-input"><button id="hsl-toggle" type="button" aria-expanded="false" aria-controls="hsl-panel" aria-label="HSL color picker"></button><input id="hex" aria-label="Base HEX" value="EF3340" maxlength="7" spellcheck="false" aria-describedby="error"></div>
         <div id="hsl-panel" class="hsl-panel" role="dialog" aria-label="HSL color picker" hidden>
           <div id="sl-plane" tabindex="0" role="slider" aria-label="Saturation and lightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span id="sl-marker"></span></div>
           <label class="picker-hue-label" for="picker-hue">Hue</label><input id="picker-hue" type="range" min="0" max="359.9" step="0.1" value="0" aria-label="HSL hue">
-          <div class="hsl-fields">
-            <label>H (°)<input id="hsl-h" type="number" min="0" max="359.9" step="0.1"></label>
-            <label>S (%)<input id="hsl-s" type="number" min="0" max="100" step="0.1"></label>
-            <label>L (%)<input id="hsl-l" type="number" min="0" max="100" step="0.1"></label>
-          </div>
+          <label class="picker-hue-label" for="hsl-s">Saturation</label><input id="hsl-s" type="range" min="0" max="100" step="0.1">
+          <label class="picker-hue-label" for="hsl-l">Lightness</label><input id="hsl-l" type="range" min="0" max="100" step="0.1">
         </div>
       </div>
       <fieldset class="neutral-control" aria-label="Neutral hue"><div id="neutral-options" class="neutral-options"></div></fieldset>
@@ -227,15 +224,14 @@ h2 { font-size: 17px; margin: 0; }
 
   </div>
 </header>
-<main id="matrix" aria-labelledby="matrix-title">
+<main id="matrix" aria-label="Color matrix">
   <div class="theme-inner">
-    <h2 id="matrix-title">Color matrix</h2>
-    <p id="blocks-label" aria-live="polite"></p>
     <div class="matrix-scroll">
-      <table class="matrix-table" aria-labelledby="matrix-title"><tbody id="matrix-rows"></tbody></table>
+      <table class="matrix-table" aria-label="Color matrix"><tbody id="matrix-rows"></tbody></table>
     </div>
   </div>
 </main>
+<footer id="palette-footer" aria-hidden="true"></footer>
 <script>
 const mod=x=>(x%360+360)%360;
 const anchors=[[0,0],[60,30],[120,60],[180,120],[240,240],[300,270],[360,360]];
@@ -326,36 +322,45 @@ const fmt=(n,p=6)=>Number(n.toFixed(p)).toString();
 const ok=(L,C,H)=>`oklch(${fmt(L)} ${fmt(C)} ${fmt(H,4)})`;
 let selectedNeutral=4,lastHex='#EF3340',rowId=0,pickerHSL={h:0,s:1,l:.5};
 const recipeHex=v=>colorValues(v.L,v.C,v.H).hex;
-const ratioText=(a,b)=>{const r=contrastRatio(a,b);return `${r.toFixed(2)}:1 · ${r>=7?'AAA':r>=4.5?'AA':'Below AA'}`;};
+const saturated = new Set();
+let baseHue = 0;
+function maximumColor(name, [L, C, H]) {
+  const hue = name.startsWith('color-gray-') ? baseHue : H;
+  return [L, maxChroma(L / 100, hue), hue];
+}
+function contrastLine(hex, background) {
+  const ratio = contrastRatio(hex, background);
+  const level = ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : 'Below AA';
+  return `<p><code style="color:${hex};background:${background}">${hex}</code>
+    <code>${background}</code> <strong data-level="${level}">${ratio.toFixed(2)}:1 · ${level}</strong></p>`;
+}
 function closeHints() {
   document.querySelectorAll('.hint-anchor.pinned').forEach(anchor => anchor.classList.remove('pinned'));
 }
-function toggleHint(anchor) {
-  const pinned = anchor.classList.contains('pinned');
-  closeHints();
-  anchor.classList.remove('suppressed');
-  anchor.classList.toggle('pinned', !pinned);
-}
-function makeColorHint(name, [lightness, chroma, hue], background, alert, isBlocks, tintedInk) {
+function makeColorHint(name, [lightness, chroma, hue], background, alert, tintedInk) {
   const L = lightness / 100;
-  const {hex, max: maximum} = colorValues(L, chroma, hue);
-  const preview = hexFor(L, maximum, hue);
+  const {hex} = colorValues(L, chroma, hue);
+  const [, maximum, maxHue] = maximumColor(name, [lightness, chroma, hue]);
+  const preview = hexFor(L, maximum, maxHue);
   const id = `hint-${rowId++}`;
   const anchor = document.createElement('div');
   anchor.className = 'hint-anchor';
   anchor.style.cssText = `--sample:${hex};--sample-max:${preview};--sample-ink:${tintedInk ?? background}`;
-  const label = name + (isBlocks ? ' — use as Blocks background' : '');
+  const label = name;
+  anchor.classList.toggle('saturated', saturated.has(name));
+  const activeHex = saturated.has(name) ? preview : hex;
   anchor.innerHTML = `<button type="button" class="matrix-swatch sample-outline"
-      aria-label="${label}, Outline" aria-describedby="${id}">Outline</button>
+      aria-label="${label}, Outline" aria-describedby="${id}" aria-pressed="${saturated.has(name)}">Outline</button>
     <button type="button" class="matrix-swatch sample-filled"
-      aria-label="${label}, Filled" aria-describedby="${id}">Filled</button>
+      aria-label="${label}, Filled" aria-describedby="${id}" aria-pressed="${saturated.has(name)}">Filled</button>
     <div id="${id}" class="color-hint" role="tooltip">
       <b>--${name}</b>
-      <p><code>oklch(${fmt(lightness)}% ${fmt(chroma)} ${fmt(hue,4)})</code></p>
-      <p>HEX <code>${hex}</code></p>
-      <p>Maximum Chroma <code>${fmt(maximum)}</code></p>
-      <p>WCAG / Blocks <code>${background}</code><br>${ratioText(hex, background)}</p>
-      ${alert ? `<p>WCAG / Alerts <code>${alert}</code><br>${ratioText(hex, alert)}</p>` : ''}
+      <div class="hint-colors">
+        <div><span style="background:${hex}"></span>Original <code>${hex}</code><code>${ok(L, chroma, hue)}</code></div>
+        <div><span style="background:${preview}"></span>Maximum Chroma <code>${preview}</code><code>${ok(L, maximum, maxHue)}</code></div>
+      </div>
+      ${contrastLine(activeHex, background)}
+      ${alert ? contrastLine(activeHex, alert) : ''}
     </div>`;
   const positionHint = () => {
     const rect = anchor.getBoundingClientRect();
@@ -365,18 +370,25 @@ function makeColorHint(name, [lightness, chroma, hue], background, alert, isBloc
   };
   anchor.onpointerenter = positionHint;
   anchor.onfocusin = positionHint;
-  anchor.onpointerleave = () => anchor.classList.remove('suppressed');
+  anchor.onpointerleave = () => anchor.classList.remove('suppressed', 'preview-paused');
   for (const button of anchor.querySelectorAll('button')) {
     button.onclick = () => {
-      toggleHint(anchor);
-      positionHint();
+      if (saturated.has(name)) saturated.delete(name);
+      else saturated.add(name);
+      const selector = button.classList[1];
+      render();
+      const next = document.getElementById(id).parentElement;
+      next.classList.add('pinned', 'preview-paused');
+      next.querySelector('.' + selector).focus({preventScroll: true});
+      next.onpointerenter();
     };
   }
   return anchor;
 }
 function renderMatrix(tokens, original, families, roles, alerts, alertInk) {
   const blocksToken = blocksForTheme[activeTheme];
-  const [L, C, H] = tokens.get(blocksToken);
+  const value = tokens.get(blocksToken);
+  const [L, C, H] = saturated.has(blocksToken) ? maximumColor(blocksToken, value) : value;
   const background = recipeHex({L: L / 100, C, H});
   document.documentElement.style.setProperty('--page-blocks', background);
 
@@ -386,18 +398,24 @@ function renderMatrix(tokens, original, families, roles, alerts, alertInk) {
     cell.textContent = [...new Set(names.map(name => roles.get(name)).filter(Boolean))].join(', ');
   }
 
-  const rows = graySteps.flatMap(([step]) => {
-    if (![['color-gray', 'color-neutral'], families].flat().some(family => roles.has(`${family}-${step}`))) return [];
-    const row = document.createElement('tr');
-    for (const group of [['color-gray', 'color-neutral'], families]) {
-      const names = group.map(family => `${family}-${step}`);
-      for (const name of names) {
-        const cell = row.insertCell();
-        const value = tokens.get(name);
-        if (value && roles.has(name)) cell.append(matrixSample(name, value, background, alerts.get(name), alertInk.get(name)));
-      }
-      appendFunction(row, names);
+  const neutral = activeTheme === 'light' ? 'color-neutral' : 'color-gray';
+  function appendColor(row, name) {
+    const cell = row.insertCell();
+    if (roles.has(name)) {
+      cell.append(matrixSample(name, tokens.get(name), background, alerts.get(name), alertInk.get(name)));
     }
+  }
+
+  const rows = graySteps.flatMap(([step]) => {
+    const neutralName = `${neutral}-${step}`;
+    const colorNames = families.map(family => `${family}-${step}`);
+    if (![neutralName, ...colorNames].some(name => roles.has(name))) return [];
+
+    const row = document.createElement('tr');
+    appendFunction(row, [neutralName]);
+    appendColor(row, neutralName);
+    for (const name of colorNames) appendColor(row, name);
+    appendFunction(row, colorNames);
     return row;
   });
 
@@ -405,42 +423,25 @@ function renderMatrix(tokens, original, families, roles, alerts, alertInk) {
     ['color-white', tokens.get('color-white'), roles.get('color-white')],
     ['my-brand-color', [original[0] * 100, original[1], original[2]], 'Brand'],
   ]) {
+    if (!label) continue;
     const row = document.createElement('tr');
-    row.insertCell().append(matrixSample(name, value, background, alerts.get(name), alertInk.get(name)));
-    row.insertCell();
     const cell = row.insertCell();
     cell.className = 'matrix-function';
-    cell.textContent = label ?? '';
+    cell.textContent = label;
+    row.insertCell().append(matrixSample(name, value, background, alerts.get(name)));
     row.insertCell().colSpan = families.length + 1;
     rows.push(row);
   }
   $('#matrix-rows').replaceChildren(...rows);
-  $('#blocks-label').textContent = `Blocks background: --${blocksToken}`;
 }
 
 function matrixSample(name, value, background, alert, tintedInk) {
-  const isBlocks = name === 'color-white' || name === 'color-gray-900';
-  const anchor = makeColorHint(name, value, background, alert, isBlocks, tintedInk);
-  if (isBlocks) {
-    for (const button of anchor.querySelectorAll('button')) {
-      const theme = name === 'color-white' ? 'light' : 'dark';
-      button.dataset.blocks = name;
-      button.setAttribute('aria-pressed', String(name === blocksForTheme[activeTheme]));
-      button.onclick = () => {
-        if (activeTheme === theme) {
-          toggleHint(anchor);
-          return;
-        }
-        setTheme(theme);
-        document.querySelector(`[data-blocks="${name}"].${button.classList[1]}`).focus();
-      };
-    }
-  }
-  return anchor;
+  return makeColorHint(name, value, background, alert, tintedInk);
 }
 
 function render(restoreFocus){
   const input = $('#hex');
+  if (input.value.startsWith('#')) input.value = input.value.slice(1);
   const value = input.value.trim();
   const valid = /^#?(?:[a-f\d]{3}|[a-f\d]{6})$/i.test(value);
   $('#error').textContent = valid ? '' : 'Enter a HEX color, e.g. #EF3340 or #ABC';
@@ -452,13 +453,14 @@ function render(restoreFocus){
     input.setAttribute('aria-invalid', 'true');
   }
   const rgb = hexRgb(lastHex).map(channel => channel / 255);
-  $('#input-swatch').style.background = lastHex;
+  $('#hsl-toggle').style.background = lastHex;
   const rgbH=rgbHue(rgb),original=toOklch(rgb);
   const hues=generateHues(rgb,{fallback:Number($('#gray-hue').value)||0}).map(x=>({...x,family:colorFamily(x.h)}));
   $('#neutral-options').innerHTML=hues.map((x,i)=>{const C=maxChroma(.691,x.h),hex=hexFor(.691,C,x.h);return `<label class="hue-option" title="${x.family.name} · ${fmt(x.h,2)}° · ${ok(.691,C,x.h)}"><input type="radio" name="neutral-hue" value="${i}" ${i===selectedNeutral?'checked':''} aria-label="${x.family.name} ${fmt(x.h,1)}°"><span style="background:${hex}"></span></label>`;}).join('');
   document.querySelectorAll('[name="neutral-hue"]').forEach(r=>r.onchange=()=>{selectedNeutral=Number(r.value);render(selectedNeutral);});
   $('#gray-hue-label').hidden=rgbH!==null;
   const H=hues[selectedNeutral].h;rowId=0;
+  baseHue = hues[0].h;
   const tokens = new Map();
   for (const [step, lightness] of graySteps) {
     tokens.set(`color-gray-${step}`, [lightness, 0, 0]);
@@ -483,7 +485,9 @@ function render(restoreFocus){
     return {h, prefix};
   });
 
+  const activeValue = (name, value) => saturated.has(name) ? maximumColor(name, value) : value;
   const roles = new Map();
+  const colorfulByFamily = new Map();
   const alerts = new Map();
   const alertInk = new Map();
   const neutralAlert = recipeHex(colorRecipe(activeTheme, H, false)[2]);
@@ -492,7 +496,11 @@ function render(restoreFocus){
     const lightness = Number((L * 100).toFixed(2));
     const step = graySteps.find(([, level]) => level === lightness)?.[0];
     const token = L === 1 ? 'color-white' : `color-${C ? 'neutral' : 'gray'}-${step}`;
-    roles.set(token, role);
+    if (role !== 'Blocks') roles.set(token, role);
+    if (role === 'Secondary text') {
+      const [level, chroma, hue] = activeValue(token, tokens.get(token));
+      document.documentElement.style.setProperty('--function-ink', ok(level / 100, chroma, hue));
+    }
   }
   for (const token of tokens.keys()) {
     if (/^color-(gray-|neutral-|white$)/.test(token)) alerts.set(token, neutralAlert);
@@ -501,26 +509,42 @@ function render(restoreFocus){
     const recipes = colorRecipe(activeTheme, h, false);
     const colorfulStep = recipes[1].L === .691 ? 500 : 600;
     const steps = activeTheme === 'light' ? [800, colorfulStep, 50] : [200, 500, 950];
-    const [L, C, H] = tokens.get(`${prefix}-${steps[2]}`);
+    colorfulByFamily.set(colorFamily(h).name, `${prefix}-${steps[1]}`);
+    const [L, C, H] = activeValue(`${prefix}-${steps[2]}`, tokens.get(`${prefix}-${steps[2]}`));
     const alert = recipeHex({L: L / 100, C, H});
-    const [textL, textC, textH] = tokens.get(`${prefix}-${steps[0]}`);
+    const [textL, textC, textH] = activeValue(`${prefix}-${steps[0]}`, tokens.get(`${prefix}-${steps[0]}`));
     alertInk.set(`${prefix}-${steps[2]}`, recipeHex({L: textL / 100, C: textC, H: textH}));
     for (const [i, step] of steps.entries()) roles.set(`${prefix}-${step}`, recipes[i].role);
     for (const step of [50, 200, 500, 600, 800, 950]) alerts.set(`${prefix}-${step}`, alert);
+  }
+  const footerToken = `${palettes[selectedNeutral].prefix}-${activeTheme === 'light' ? 50 : 950}`;
+  const [footerL, footerC, footerH] = activeValue(footerToken, tokens.get(footerToken));
+  $('#palette-footer').style.background = ok(footerL / 100, footerC, footerH);
+  for (const family of ['Green', 'Yellow', 'Red']) {
+    const token = colorfulByFamily.get(family);
+    const reference = colorFamilies.find(color => color.name === family);
+    const step = activeTheme === 'dark' || family === 'Yellow' ? 500 : 600;
+    const [L, C, hue] = token
+      ? activeValue(token, tokens.get(token))
+      : step === 500 ? [69.1, family === 'Red' ? .185 : .158, reference.h] : [57.3, .185, reference.h];
+    document.documentElement.style.setProperty(`--wcag-${family.toLowerCase()}`, ok(L / 100, C, hue));
   }
   const [tinted] = colorRecipe(activeTheme, H, false);
   document.documentElement.style.setProperty('--control-ink', ok(tinted.L, tinted.C, H));
   $('#theme-toggle').setAttribute('aria-pressed', String(activeTheme === 'dark'));
   document.documentElement.dataset.theme = activeTheme;
   renderMatrix(tokens, original, palettes.map(({prefix}) => prefix), roles, alerts, alertInk);
-  exportCss = `:root {\n  --my-brand-color: ${lastHex};\n}\n\n@theme static {\n` +
-    [...tokens].map(([name, [L, C, H]]) =>
-      `  --${name}: oklch(${L}% ${fmt(C)} ${fmt(H, 4)});`
-    ).join('\n') + '\n}\n';
+  const [brandL, brandC, brandH] = activeValue('my-brand-color', [original[0] * 100, original[1], original[2]]);
+  const brand = saturated.has('my-brand-color') ? ok(brandL / 100, brandC, brandH) : lastHex;
+  exportCss = `:root {\n  --my-brand-color: ${brand};\n}\n\n@theme static {\n` +
+    [...tokens].map(([name, value]) => {
+      const [L, C, H] = activeValue(name, value);
+      return `  --${name}: oklch(${L}% ${fmt(C)} ${fmt(H, 4)});`;
+    }).join('\n') + '\n}\n';
   if(typeof restoreFocus==='number')document.querySelector(`[name="neutral-hue"][value="${restoreFocus}"]`).focus();
 }
 function hexRgb(hex){return hex.slice(1).match(/../g).map(v=>parseInt(v,16));}
-const hslFields = [['h', 1, 359.9], ['s', 100, 100], ['l', 100, 100]];
+const hslSliders = [['h', '#picker-hue', 1], ['s', '#hsl-s', 100], ['l', '#hsl-l', 100]];
 
 function syncPicker() {
   const rgb = hexRgb(lastHex).map(channel => channel / 255);
@@ -540,11 +564,11 @@ function paintPicker() {
   $('#sl-marker').style.top = `${(1 - l) * 100}%`;
   plane.setAttribute('aria-valuenow', Math.round(s * 100));
   plane.setAttribute('aria-valuetext', `S ${Math.round(s * 100)}%, L ${Math.round(l * 100)}%`);
-  $('#picker-hue').value = h;
-  for (const [channel, scale, max] of hslFields) {
-    const input = $(`#hsl-${channel}`);
-    if (document.activeElement !== input) input.value = Math.min(max, fmt(pickerHSL[channel] * scale, 1));
+  for (const [channel, selector, scale] of hslSliders) {
+    $(selector).value = pickerHSL[channel] * scale;
   }
+  $('#hsl-s').style.background = `linear-gradient(to right, hsl(${h} 0% ${l * 100}%), hsl(${h} 100% ${l * 100}%))`;
+  $('#hsl-l').style.background = `linear-gradient(to right, #000, hsl(${h} ${s * 100}% 50%), #fff)`;
 }
 
 function applyPicker() {
@@ -554,33 +578,29 @@ function applyPicker() {
     const k = (offset + h / 30) % 12;
     return Math.round(255 * (l - amplitude * Math.max(-1, Math.min(k - 3, 9 - k, 1))));
   });
-  $('#hex').value = '#' + rgb.map(channel => channel.toString(16).padStart(2, '0')).join('').toUpperCase();
+  $('#hex').value = rgb.map(channel => channel.toString(16).padStart(2, '0')).join('').toUpperCase();
   render();
   paintPicker();
 }
 function planePoint(e){const rect=$('#sl-plane').getBoundingClientRect();pickerHSL.s=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));pickerHSL.l=1-Math.max(0,Math.min(1,(e.clientY-rect.top)/rect.height));applyPicker();}
 $('#hex').addEventListener('input',()=>{render();if(!$('#hex').hasAttribute('aria-invalid'))syncPicker();});
-$('#hex').addEventListener('blur',()=>{if(!$('#hex').hasAttribute('aria-invalid'))$('#hex').value=lastHex;});
+$('#hex').addEventListener('blur',()=>{if(!$('#hex').hasAttribute('aria-invalid'))$('#hex').value=lastHex.slice(1);});
 $('#gray-hue').oninput=render;
 $('#hsl-toggle').onclick=()=>{const open=$('#hsl-panel').hidden;$('#hsl-panel').hidden=!open;$('#hsl-toggle').setAttribute('aria-expanded',String(open));if(open){closeHints();syncPicker();}};
 $('#sl-plane').onpointerdown=e=>{if(!e.isPrimary||e.button>0)return;$('#sl-plane').setPointerCapture(e.pointerId);planePoint(e);};
 $('#sl-plane').onpointermove=e=>{if($('#sl-plane').hasPointerCapture(e.pointerId))planePoint(e);};
 $('#sl-plane').onpointerup=e=>{if($('#sl-plane').hasPointerCapture(e.pointerId))$('#sl-plane').releasePointerCapture(e.pointerId);};
 $('#sl-plane').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const step=e.shiftKey?.1:.01;if(e.key==='ArrowLeft')pickerHSL.s=Math.max(0,pickerHSL.s-step);if(e.key==='ArrowRight')pickerHSL.s=Math.min(1,pickerHSL.s+step);if(e.key==='ArrowUp')pickerHSL.l=Math.min(1,pickerHSL.l+step);if(e.key==='ArrowDown')pickerHSL.l=Math.max(0,pickerHSL.l-step);applyPicker();};
-$('#picker-hue').oninput=e=>{pickerHSL.h=Number(e.target.value);applyPicker();};
-for (const [channel, scale, max] of hslFields) {
-  const input = $(`#hsl-${channel}`);
-  input.oninput = () => {
-    if (Number.isNaN(input.valueAsNumber)) return;
-    pickerHSL[channel] = Math.min(max, Math.max(0, input.valueAsNumber)) / scale;
+for (const [channel, selector, scale] of hslSliders) {
+  $(selector).oninput = event => {
+    pickerHSL[channel] = event.target.valueAsNumber / scale;
     applyPicker();
   };
-  input.onblur = () => { input.value = Math.min(max, fmt(pickerHSL[channel] * scale, 1)); };
 }
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('.downloads'))$('.downloads').open=false;if(!e.target.closest('.hint-anchor'))closeHints();if(!e.target.closest('.hex-control')){$('#hsl-panel').hidden=true;$('#hsl-toggle').setAttribute('aria-expanded','false');}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('.downloads').open){$('.downloads').open=false;$('.downloads summary').focus();return;}document.querySelectorAll('.hint-anchor').forEach(a=>a.classList.add('suppressed'));closeHints();$('#hsl-panel').hidden=true;$('#hsl-toggle').setAttribute('aria-expanded','false');document.activeElement?.blur();}});
 const initialHex = locationParams.get('hex');
-if (/^#[a-f0-9]{6}$/i.test(initialHex ?? '')) $('#hex').value = initialHex;
+if (/^#?(?:[a-f0-9]{3}|[a-f0-9]{6})$/i.test(initialHex ?? '')) $('#hex').value = initialHex.replace('#', '');
 const initialNeutral = Number(locationParams.get('neutral') ?? 4);
 if (Number.isInteger(initialNeutral) && initialNeutral >= 0 && initialNeutral < 6) selectedNeutral = initialNeutral;
 const fallback = Number(locationParams.get('fallback') ?? 0);
