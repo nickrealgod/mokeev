@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OKLCH palette</title><style>:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111;background:#fff;font-synthesis:none}*{box-sizing:border-box}body{margin:0}input,select{font:inherit}input,select,summary{-webkit-tap-highlight-color:transparent}.page-controls{background:#fff;padding:64px 40px 32px}.controls-inner,.theme-inner{max-width:1120px;margin:0 auto}.page-title{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:34px}h1{margin:0;font-size:30px;font-weight:550;letter-spacing:-1px}.page-title p{margin:0;font-size:12px;color:#777}.inputs{display:flex;align-items:flex-start;gap:32px}.inputs label{display:block;margin-bottom:9px;font-size:11px;color:#777}.hex-input{display:flex;align-items:center;gap:12px}#picker{height:34px;width:34px;border:0;padding:0;background:none;cursor:pointer}#picker::-webkit-color-swatch-wrapper{padding:0}#picker::-webkit-color-swatch{border:none;border-radius:0}#hex{border:0;border-bottom:1px solid #ddd;border-radius:0;background:#fff;color:#111;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:21px;letter-spacing:.2px;padding:2px 0 5px;width:150px;outline:none}#hex:focus{border-color:#111}#hex[aria-invalid=true]{border-color:#b32d2d}select{height:34px;border:0;border-bottom:1px solid #ddd;background:#fff;color:#111;border-radius:0;padding:0 25px 0 0;min-width:185px;font-size:14px}#error{margin:12px 0 0;font-size:12px;color:#b32d2d;min-height:0}#error:empty{display:none}#base-hue{font-size:11px;color:#777;margin:16px 0 0}.settings{margin-top:18px;font-size:11px;line-height:1.8;color:#777;max-width:730px}.settings summary{cursor:pointer;display:inline-block}.settings p{margin:12px 0}.settings label{color:#555}#gray-hue-label{font-size:12px;display:block;margin:12px 0}#gray-hue{width:70px;padding:4px;border:1px solid #ddd}.theme-section{padding:40px 40px 72px}.light-section{background:#fff;color:#111}.dark-section{background:#000;color:#fff}h2{font-size:17px;font-weight:500;letter-spacing:-.3px;margin:0 0 26px}.table-scroll{overflow-x:auto}table{width:100%;border-collapse:separate;border-spacing:0 16px;table-layout:fixed;margin-top:-16px}td{padding:0;vertical-align:middle;height:64px;border:0;text-align:left}.sample-col{width:96px}.function-col{width:190px}.hex-col{width:130px}.oklch-col{width:390px}.max-col{width:100px}.swatch{width:64px;height:64px;border:0;border-radius:0}.family-name{display:block;color:#858585;font-size:11px;margin-bottom:5px}.function-name{display:block;font-size:13px;font-weight:450}.hex-value,.oklch-value,.max-value{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}.hex-value,.oklch-value{user-select:all}.max-value{color:#666}.dark-section .max-value{color:#aaa}.dark-section .family-name{color:#888}.max-swatch{cursor:default}input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #777;outline-offset:4px}[hidden]{display:none!important}@media(max-width:1000px){.page-controls{padding:40px 24px 24px}.theme-section{padding:32px 24px 56px}table{min-width:630px}.sample-col{width:80px}.function-col{width:100px}.hex-col{width:80px}.oklch-col{width:218px}.max-col{width:72px}.hex-value,.oklch-value,.max-value{font-size:11px}.page-title{align-items:flex-start}}@media(max-width:560px){.page-controls{padding:28px 20px 22px}.theme-section{padding:30px 20px 48px}.page-title{display:block;margin-bottom:26px}.page-title p{margin-top:10px}.inputs{gap:22px;flex-wrap:wrap}h1{font-size:27px}#hex{width:130px;font-size:19px}select{min-width:160px;font-size:13px}.hex-value,.oklch-value,.max-value{font-size:11px}}
 
 .divider-col{width:28px}.color-divider{width:2px;height:64px}.page-controls{padding-top:40px}@media(max-width:1000px){table{min-width:658px}.divider-col{width:28px}}
@@ -9,6 +9,123 @@ button,input{font:inherit}button{cursor:pointer}.swatch{border-radius:16px}butto
 .hint-anchor.suppressed .color-hint{display:none!important}
 
 .hue-option input,.hue-option span{width:48px;height:48px}.hue-option span{border-radius:12px}.hue-option input:checked+span{outline:none}.hue-option input:checked+span:after{top:50%;left:50%;bottom:auto;right:auto;transform:translate(-50%,-50%)}.hue-option input:focus-visible+span{outline:none;box-shadow:inset 0 0 0 2px #ffffffaa}.neutral-options{gap:10px}@media(max-width:560px){.neutral-options{display:flex;flex-wrap:wrap;gap:8px}}
+
+#export-css {
+  margin-top: 18px;
+  padding: 9px 13px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+}
+table { max-width: 960px; }
+.preview-col { width: 168px; }
+.token-examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.token-examples span {
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.example-fill { background: var(--preview-color); color: var(--preview-ink); }
+.example-border { border: 1px solid var(--preview-color); }
+.family-name { overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+  .preview-col { width: 68px; }
+  .function-col { width: 100px; }
+}
+
+:root {
+  --gray-50: oklch(98.3% 0 0);
+  --gray-100: oklch(92.7% 0 0);
+  --gray-200: oklch(80.9% 0 0);
+  --gray-500: oklch(50% 0 0);
+  --gray-700: oklch(30.9% 0 0);
+  --gray-900: oklch(23.6% 0 0);
+  --gray-950: oklch(19.1% 0 0);
+  background: var(--gray-50);
+  color: var(--gray-950);
+}
+.page-controls, .light-section, .hex-input, #hex, .rgb-panel, #export-css,
+.color-hint { background: var(--gray-50); color: var(--gray-950); }
+.dark-section, .dark-section .color-hint {
+  background: var(--gray-900);
+  color: var(--gray-50);
+}
+.hex-input, #export-css, .rgb-fields input { border-color: var(--gray-200); }
+#matrix-link { color: inherit; margin-right: 16px; font-size: 13px; }
+.button-col { width: min(55%, 320px); }
+.token-examples { gap: 10px; }
+.token-examples button {
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+.example-fill { border: 1px solid var(--preview-color); }
+.example-border { color: var(--preview-color); background: transparent; }
+#palette-view .hint-anchor { width: auto; }
+.oklch-value, .family-name { display: block; margin: 3px 0; }
+#matrix { background: var(--blocks, white); }
+#matrix p { font-size: 13px; }
+.matrix-scroll { overflow-x: auto; }
+.matrix-table { min-width: 735px; max-width: none; border-spacing: 6px; }
+.matrix-table td { height: 50px; }
+.matrix-table th { text-align: left; font-size: 12px; }
+.matrix-table th:first-child { width: 85px; }
+.matrix-swatch {
+  display: block;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid #80808050;
+}
+.matrix-table .hint-anchor { width: 46px; }
+.matrix-swatch[aria-pressed="true"] { outline: 2px solid currentColor; outline-offset: 2px; }
+.hint-anchor:has(button:focus-visible) .color-hint { display: block; }
+.matrix-table .color-hint {
+  position: fixed;
+  top: var(--hint-top, 12px);
+  left: var(--hint-left, 12px);
+  width: min(286px, calc(100vw - 24px));
+  z-index: 100;
+}
+@media (max-width: 560px) {
+  .button-col { width: 48%; }
+  .token-examples button { padding-inline: 12px; }
+}
+
+.inputs .theme-toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 48px; margin: 0; color: inherit; }
+[data-theme="dark"], [data-theme="dark"] .page-controls,
+[data-theme="dark"] .hex-input, [data-theme="dark"] #hex,
+[data-theme="dark"] #export-css, [data-theme="dark"] .rgb-panel {
+  background: var(--gray-900);
+  color: var(--gray-50);
+}
+.matrix-table th:first-child { width: auto; }
+.matrix-table th:last-child { width: 170px; }
+.matrix-table td:last-child { font-size: 12px; }
+.matrix-swatch[aria-pressed="true"] { outline: none; }
+.matrix-swatch[aria-pressed="true"]::after {
+  content: '';
+  display: block;
+  width: 7px;
+  height: 7px;
+  margin: auto;
+  border-radius: 50%;
+  background: currentColor;
+}
+.matrix-swatch:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+:root, :root[data-theme], :root[data-theme] .page-controls,
+.light-section, .dark-section { background: var(--page-blocks, #fff); }
+#matrix { padding-top: 48px; }
+.matrix-table { margin-top: 0; }
+.matrix-table thead th {
+  padding: 8px 0;
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+.token-description { margin: 5px 0 0; font-size: 12px; overflow-wrap: anywhere; }
 </style></head>
 <body>
 <header class="page-controls">
@@ -16,22 +133,35 @@ button,input{font:inherit}button{cursor:pointer}.swatch{border-radius:16px}butto
     <div class="inputs">
       <div class="hex-control"><div class="hex-input"><span id="input-swatch"></span><input id="hex" aria-label="Base HEX" value="#EF3340" maxlength="7" spellcheck="false" aria-describedby="error"><button id="rgb-toggle" type="button" aria-expanded="false" aria-controls="rgb-panel">RGB <span>⌄</span></button></div>
         <div id="rgb-panel" class="rgb-panel" role="dialog" aria-label="RGB color picker" hidden>
-          <div id="sv-plane" tabindex="0" role="slider" aria-label="Насыщенность и яркость" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span id="sv-marker"></span></div>
+          <div id="sv-plane" tabindex="0" role="slider" aria-label="Saturation and value" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span id="sv-marker"></span></div>
           <label class="picker-hue-label" for="picker-hue">Hue</label><input id="picker-hue" type="range" min="0" max="359.9" step="0.1" value="0" aria-label="RGB hue">
           <div class="rgb-fields"><label>R<input id="rgb-r" type="number" min="0" max="255" step="1"></label><label>G<input id="rgb-g" type="number" min="0" max="255" step="1"></label><label>B<input id="rgb-b" type="number" min="0" max="255" step="1"></label></div>
         </div>
       </div>
       <fieldset class="neutral-control" aria-label="Neutral hue"><div id="neutral-options" class="neutral-options"></div></fieldset>
+      <label class="theme-toggle"><input id="theme-toggle" type="checkbox" role="switch"> Dark theme</label>
     </div>
+    <a id="matrix-link" href="?view=matrix">Color matrix</a>
+    <button id="export-css" type="button">Download Tailwind CSS</button>
     <p id="error" role="status"></p>
-    <label id="gray-hue-label" hidden>Опорный RGB Hue <input id="gray-hue" type="number" min="0" max="359" value="0"></label>
+    <label id="gray-hue-label" hidden>Reference RGB hue <input id="gray-hue" type="number" min="0" max="359" value="0"></label>
 
   </div>
 </header>
-<main>
-  <section class="theme-section light-section" aria-labelledby="light-title"><div class="theme-inner"><h2 id="light-title">Light theme</h2><div class="table-scroll"><table aria-label="Палитра светлой темы: образец с подсказкой, функция, цветной разделитель, OKLCH"><colgroup><col class="sample-col"><col class="function-col"><col class="divider-col"><col class="oklch-col"></colgroup><tbody id="light-rows"></tbody></table></div></div></section>
-  <section class="theme-section dark-section" aria-labelledby="dark-title"><div class="theme-inner"><h2 id="dark-title">Dark theme</h2><div class="table-scroll"><table aria-label="Палитра тёмной темы: образец с подсказкой, функция, цветной разделитель, OKLCH"><colgroup><col class="sample-col"><col class="function-col"><col class="divider-col"><col class="oklch-col"></colgroup><tbody id="dark-rows"></tbody></table></div></div></section>
+<main id="palette-view">
+  <section class="theme-section light-section" aria-labelledby="light-title"><div class="theme-inner"><h2 id="light-title">Light theme</h2><div class="table-scroll"><table aria-label="Light palette: color details, role, OKLCH, and examples"><colgroup><col class="button-col"><col></colgroup><tbody id="light-rows"></tbody></table></div></div></section>
+  <section class="theme-section dark-section" aria-labelledby="dark-title"><div class="theme-inner"><h2 id="dark-title">Dark theme</h2><div class="table-scroll"><table aria-label="Dark palette: color details, role, OKLCH, and examples"><colgroup><col class="button-col"><col></colgroup><tbody id="dark-rows"></tbody></table></div></div></section>
 </main>
+<section id="matrix" class="theme-section" hidden aria-labelledby="matrix-title">
+  <div class="theme-inner">
+    <h2 id="matrix-title">Color matrix</h2>
+    <p id="blocks-label" aria-live="polite"></p>
+    <p>Select the white or gray-900 Blocks swatch to change the background.</p>
+    <div class="matrix-scroll">
+      <table class="matrix-table"><thead><tr id="matrix-head"></tr></thead><tbody id="matrix-rows"></tbody></table>
+    </div>
+  </div>
+</section>
 <script>const mod=x=>(x%360+360)%360;
 const anchors=[[0,0],[60,30],[120,60],[180,120],[240,240],[300,270],[360,360]];
 function mapHue(h,inverse=false){h=mod(h);const a=anchors.map(p=>inverse?[p[1],p[0]]:p);for(let i=1;i<a.length;i++)if(h<=a[i][0])return a[i-1][1]+(h-a[i-1][0])/(a[i][0]-a[i-1][0])*(a[i][1]-a[i-1][1]);}
@@ -109,24 +239,156 @@ function relativeLuminance(hex){
 }
 function contrastRatio(first,second){const a=relativeLuminance(first),b=relativeLuminance(second);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);}
 if(typeof module!=='undefined')module.exports={mod,mapHue,hslRgb,rgbHue,toOklch,linearRgb,inGamut,maxChroma,hexFor,correction,palettonAngle,palettonRgb,palettonBaseSV,generateHues,colorFamily,neutralRecipe,colorRecipe,colorValues,relativeLuminance,contrastRatio};
-</script><script>const $=s=>document.querySelector(s);
+</script><script>const graySteps = [[50, 98.3], [100, 92.7], [200, 80.9], [300, 69.1], [400, 57.3], [500, 50], [600, 42.7], [700, 30.9], [800, 26.4], [900, 23.6], [950, 19.1]];
+let exportCss = '';
+const locationParams = new URLSearchParams(location.search);
+const matrixView = locationParams.get('view') === 'matrix';
+let activeTheme = locationParams.get('theme') === 'dark' ? 'dark' : 'light';
+let blocksToken = activeTheme === 'dark' ? 'color-gray-900' : 'color-white';
+
+const $=s=>document.querySelector(s);
 const fmt=(n,p=6)=>Number(n.toFixed(p)).toString();
 const ok=(L,C,H)=>`oklch(${fmt(L)} ${fmt(C)} ${fmt(H,4)})`;
 let selectedNeutral=4,lastHex='#EF3340',rowId=0,pickerHSV={h:0,s:1,v:1};
 const recipeHex=v=>colorValues(v.L,v.C,v.H).hex;
-const ratioText=(a,b)=>{const r=contrastRatio(a,b);return `${r.toFixed(2)}:1 · ${r>=7?'AAA':r>=4.5?'AA':'ниже AA'}`;};
-function tokenRow({role,L,C,H},family,background,alert){
-  const v=colorValues(L,C,H),maxHex=hexFor(L,v.max,H),row=document.createElement('tr'),id='hint-'+rowId++;
-  row.dataset.l=L;row.dataset.c=C;row.dataset.h=H;
-  row.innerHTML=`<td class="sample-cell"><div class="hint-anchor"><button type="button" class="swatch" style="background:${v.hex}" aria-label="${family} ${role}: сведения о цвете" aria-expanded="false" aria-controls="${id}" aria-describedby="${id}"></button><div id="${id}" class="color-hint" role="tooltip"><div class="hint-heading"><b>${family} · ${role}</b><span>sRGB</span></div><div class="hint-values"><span>HEX</span><code>${v.hex}</code></div><div class="max-preview"><div class="swatch hint-max" style="background:${maxHex}" role="img" aria-label="Maximum Chroma ${maxHex}"></div><div><span>MAX Chroma</span><code>${fmt(v.max)}</code><code>${maxHex}</code></div></div><code class="max-oklch">${ok(L,v.max,H)}</code><div class="contrast-item"><span>WCAG / Blocks <i style="background:${background}"></i><code>${background}</code></span><b>${ratioText(v.hex,background)}</b></div><div class="contrast-item"><span>WCAG / Alerts <i style="background:${alert}"></i><code>${alert}</code></span><b>${ratioText(v.hex,alert)}</b></div>${v.outside?`<p class="gamut-note">Для HEX Chroma снижена до ${fmt(v.mapped)}. Исходный OKLCH сохранён.</p>`:''}<p class="hint-footnote">AA ≥ 4.5 · AAA ≥ 7 · обычный текст</p></div></div></td><td aria-label="Функция"><span class="family-name">${family}</span><span class="function-name">${role}</span></td><td class="divider-cell" aria-label="Цветной разделитель"><div class="color-divider" style="background:${v.hex}"></div></td><td class="oklch-value" aria-label="OKLCH">${ok(L,C,H)}</td>`;
-  row.querySelector('.hint-anchor').onpointerleave=()=>row.querySelector('.hint-anchor').classList.remove('suppressed');
-  row.querySelector('button').onclick=()=>{const anchor=row.querySelector('.hint-anchor'),was=anchor.classList.contains('pinned');anchor.classList.remove('suppressed');closeHints();if(!was){anchor.classList.add('pinned');anchor.querySelector('button').setAttribute('aria-expanded','true');}};
+const ratioText=(a,b)=>{const r=contrastRatio(a,b);return `${r.toFixed(2)}:1 · ${r>=7?'AAA':r>=4.5?'AA':'Below AA'}`;};
+function tokenRow({role,L,C,H},token,background,alert,tintedInk){
+  const utility = token.slice(6);
+  const row = document.createElement('tr');
+  const sample = colorValues(L, C, H);
+  row.innerHTML = `<td aria-label="Color examples">
+    <div class="token-examples" style="--preview-color:${ok(L,C,H)};--preview-ink:${tintedInk ?? background}">
+      <button type="button" class="example-fill bg-${utility}" title="bg-${utility}">Filled</button>
+      <button type="button" class="example-border border-${utility} text-${utility}" title="border-${utility} text-${utility}">Outline</button>
+    </div>
+  </td><td aria-label="Color token">
+    <code class="oklch-value">${ok(L,C,H)}</code>
+    <p class="token-description"><code>${token}</code> · ${role}</p>
+  </td>`;
+  row.cells[0].prepend(makeColorHint(token, [L * 100, C, H], sample.hex, background, alert, false));
+  const anchor = row.cells[0].firstElementChild;
+  const examples = row.querySelector('.token-examples');
+  anchor.prepend(examples);
+  anchor.querySelector('.matrix-swatch').remove();
+  examples.querySelectorAll('button').forEach(button => {
+    button.setAttribute('aria-describedby', anchor.querySelector('.color-hint').id);
+    button.onclick = () => toggleHint(anchor);
+  });
   return row;
 }
-function closeHints(){document.querySelectorAll('.hint-anchor.pinned').forEach(a=>{a.classList.remove('pinned');a.querySelector('button').setAttribute('aria-expanded','false');});}
+function closeHints() {
+  document.querySelectorAll('.hint-anchor.pinned').forEach(anchor => anchor.classList.remove('pinned'));
+}
+function toggleHint(anchor) {
+  const pinned = anchor.classList.contains('pinned');
+  closeHints();
+  anchor.classList.remove('suppressed');
+  anchor.classList.toggle('pinned', !pinned);
+}
+function makeColorHint(name, [lightness, chroma, hue], hex, background, alert, isBlocks) {
+  const L = lightness / 100;
+  const maximum = maxChroma(L, hue);
+  const id = `hint-${rowId++}`;
+  const anchor = document.createElement('div');
+  anchor.className = 'hint-anchor';
+  anchor.innerHTML = `<button type="button" class="matrix-swatch" style="background:${hex}"
+      aria-label="${name}${isBlocks ? ' — use as Blocks background' : ''}" aria-describedby="${id}"></button>
+    <div id="${id}" class="color-hint" role="tooltip">
+      <b>--${name}</b>
+      <p><code>oklch(${fmt(lightness)}% ${fmt(chroma)} ${fmt(hue,4)})</code></p>
+      <p>HEX <code>${hex}</code></p>
+      <p>Maximum Chroma <code>${fmt(maximum)}</code></p>
+      <p>WCAG / Blocks <code>${background}</code><br>${ratioText(hex, background)}</p>
+      ${alert ? `<p>WCAG / Alerts <code>${alert}</code><br>${ratioText(hex, alert)}</p>` : ''}
+    </div>`;
+  const positionHint = () => {
+    const rect = anchor.getBoundingClientRect();
+    const hint = anchor.querySelector('.color-hint');
+    anchor.style.setProperty('--hint-left', Math.max(12, Math.min(rect.left, innerWidth - 298)) + 'px');
+    anchor.style.setProperty('--hint-top', Math.max(12, Math.min(rect.bottom + 8, innerHeight - hint.offsetHeight - 12)) + 'px');
+  };
+  anchor.onpointerenter = positionHint;
+  anchor.onfocusin = positionHint;
+  anchor.onpointerleave = () => anchor.classList.remove('suppressed');
+  anchor.querySelector('button').onclick = () => toggleHint(anchor);
+  return anchor;
+}
+function renderMatrix(tokens, original, roles) {
+  const [L, C, H] = tokens.get(blocksToken);
+  const background = recipeHex({L: L / 100, C, H});
+  const surface = $('#matrix');
+  surface.style.setProperty('--blocks', background);
+  surface.style.color = contrastRatio(background, '#000000') >= contrastRatio(background, '#FFFFFF') ? '#000' : '#fff';
+
+  const families = [...new Set([...tokens.keys()]
+    .filter(name => name !== 'color-white')
+    .map(name => name.replace(/-\d+$/, '')))];
+  const columns = [...families.map(name => name.slice(6)), 'Tailwind index', 'Function'];
+  $('#matrix-head').replaceChildren(...columns.map(label => {
+    const cell = document.createElement('th');
+    cell.scope = 'col';
+    cell.textContent = label;
+    return cell;
+  }));
+
+  const rows = graySteps.map(([step]) => {
+    const row = document.createElement('tr');
+    const rowRoles = new Set();
+    for (const family of families) {
+      const cell = document.createElement('td');
+      const name = `${family}-${step}`;
+      const value = tokens.get(name);
+      if (value) {
+        const [L, C, H] = value;
+        cell.append(matrixSample(name, value, recipeHex({L: L / 100, C, H}), background));
+        for (const role of roles.get(name) ?? []) rowRoles.add(role);
+      }
+      row.append(cell);
+    }
+    const index = document.createElement('th');
+    index.scope = 'row';
+    index.textContent = step;
+    const functions = document.createElement('td');
+    functions.textContent = [...rowRoles].join(', ') || '—';
+    row.append(index, functions);
+    return row;
+  });
+  for (const [name, value, hex, role] of [
+    ['color-white', tokens.get('color-white'), '#FFFFFF', 'Blocks (light)'],
+    ['my-brand-color', [original[0] * 100, original[1], original[2]], lastHex, 'Brand'],
+  ]) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = families.length;
+    cell.append(matrixSample(name, value, hex, background));
+    const index = document.createElement('td');
+    index.textContent = '—';
+    const functions = document.createElement('td');
+    functions.textContent = role;
+    row.append(cell, index, functions);
+    rows.push(row);
+  }
+  $('#matrix-rows').replaceChildren(...rows);
+  $('#blocks-label').textContent = `Blocks background: --${blocksToken}`;
+}
+function matrixSample(name, value, hex, background) {
+  const isBlocks = name === 'color-white' || name === 'color-gray-900';
+  const anchor = makeColorHint(name, value, hex, background, null, isBlocks);
+  if (isBlocks) {
+    const button = anchor.querySelector('button');
+    button.dataset.blocks = name;
+    button.setAttribute('aria-pressed', String(name === blocksToken));
+    button.onclick = () => {
+      blocksToken = name;
+      render();
+      document.querySelector(`[data-blocks="${name}"]`).focus();
+    };
+  }
+  return anchor;
+}
 function render(restoreFocus){
   let value=$('#hex').value.trim();
-  if(!/^#?(?:[a-f\d]{3}|[a-f\d]{6})$/i.test(value)){$('#error').textContent='Введите HEX: #EF3340 или #ABC';$('#hex').setAttribute('aria-invalid','true');return;}
+  if(!/^#?(?:[a-f\d]{3}|[a-f\d]{6})$/i.test(value)){$('#error').textContent='Enter a HEX color, e.g. #EF3340 or #ABC';$('#hex').setAttribute('aria-invalid','true');return;}
   $('#error').textContent='';$('#hex').removeAttribute('aria-invalid');value=value.replace('#','');if(value.length===3)value=[...value].map(c=>c+c).join('');
   const rgb=value.match(/../g).map(v=>parseInt(v,16)/255);lastHex='#'+value.toUpperCase();$('#input-swatch').style.background=lastHex;
   const rgbH=rgbHue(rgb),original=toOklch(rgb);
@@ -135,12 +397,80 @@ function render(restoreFocus){
   document.querySelectorAll('[name="neutral-hue"]').forEach(r=>r.onchange=()=>{selectedNeutral=Number(r.value);render(selectedNeutral);});
   $('#gray-hue-label').hidden=rgbH!==null;
   const H=hues[selectedNeutral].h;rowId=0;
-  for(const theme of ['light','dark']){
-    const neutrals=neutralRecipe(theme,H),background=recipeHex(neutrals[1]),neutralAlert=recipeHex(colorRecipe(theme,H,false)[2]);
-    const rows=neutrals.map(v=>tokenRow(v,'Neutral',background,neutralAlert));
-    for(const hue of hues){const recipes=colorRecipe(theme,hue.h,false),alert=recipeHex(recipes[2]);rows.push(...recipes.map(v=>tokenRow(v,hue.family.name,background,alert)));}
-    $(`#${theme}-rows`).replaceChildren(...rows);
+  const tokens = new Map();
+  for (const [step, lightness] of graySteps) {
+    tokens.set(`color-gray-${step}`, [lightness, 0, 0]);
+    tokens.set(`color-neutral-${step}`, [lightness, step === 50 ? .00243 : .0064, H]);
   }
+
+  const familyCounts = new Map();
+  const palettes = hues.map(({h, family}) => {
+    const name = family.name.toLowerCase();
+    const count = (familyCounts.get(name) ?? 0) + 1;
+    familyCounts.set(name, count);
+    const prefix = `color-${name}${count > 1 ? '-' + count : ''}`;
+    const red = Math.abs(mod(h - 359 + 180) - 180) <= 30;
+    const steps = [
+      [50, 98.3, family.fill], [200, 80.9, .0707],
+      [500, 69.1, red ? .185 : .158], [600, 57.3, .185],
+      [800, 50, .1143], [950, 26.4, .0437],
+    ];
+    for (const [step, lightness, chroma] of steps) {
+      tokens.set(`${prefix}-${step}`, [lightness, chroma, h]);
+    }
+    return {h, prefix};
+  });
+
+  const roles = new Map();
+  function recordRole(token, role) {
+    if (!roles.has(token)) roles.set(token, new Set());
+    roles.get(token).add(role);
+  }
+  for (const theme of ['light', 'dark']) {
+    const neutrals = neutralRecipe(theme, H);
+    const background = recipeHex(neutrals[1]);
+    const neutralAlert = recipeHex(colorRecipe(theme, H, false)[2]);
+    const rows = neutrals.map(value => {
+      if (value.L === .983 && value.C) value = {...value, C: .00243};
+      const lightness = Number((value.L * 100).toFixed(2));
+      const step = graySteps.find(([, level]) => level === lightness)?.[0];
+      const scale = value.C ? 'neutral' : 'gray';
+      const token = lightness === 100 ? 'color-white' : `color-${scale}-${step}`;
+      tokens.set(token, [lightness, value.C, value.H]);
+      if (theme === activeTheme) recordRole(token, value.role);
+      return tokenRow(value, token, background, neutralAlert);
+    });
+    for (const {h, prefix} of palettes) {
+      const recipes = colorRecipe(theme, h, false);
+      const colorfulStep = recipes[1].L === .691 ? 500 : 600;
+      const steps = theme === 'light' ? [800, colorfulStep, 50] : [200, 500, 950];
+      const values = steps.map((step, i) => {
+        const token = `${prefix}-${step}`;
+        const [lightness, C, H] = tokens.get(token);
+        return {token, value: {role: recipes[i].role, L: lightness / 100, C, H}};
+      });
+      const alert = recipeHex(values[2].value);
+      rows.push(...values.map(({token, value}) => {
+        if (theme === activeTheme) recordRole(token, value.role);
+        return tokenRow(value, token, background, alert, value.role === 'Alerts' ? ok(values[0].value.L, values[0].value.C, h) : undefined);
+      }));
+    }
+    $(`#${theme}-title`).closest('section').hidden = theme !== activeTheme;
+    $(`#${theme}-rows`).replaceChildren(...(theme === activeTheme ? rows : []));
+  }
+  const params = new URLSearchParams({hex: lastHex, neutral: selectedNeutral, fallback: $('#gray-hue').value});
+  params.set('view', matrixView ? 'palette' : 'matrix');
+  params.set('theme', activeTheme);
+  document.documentElement.dataset.theme = activeTheme;
+  document.documentElement.style.setProperty('--page-blocks', matrixView
+    ? recipeHex({L: tokens.get(blocksToken)[0] / 100, C: 0, H: 0})
+    : recipeHex(neutralRecipe(activeTheme, H)[1]));
+  $('#matrix-link').href = `?${params}`;
+  if (matrixView) renderMatrix(tokens, original, roles);
+  exportCss = `:root {\n  --my-brand-color: ${lastHex};\n}\n\n@theme static {\n` +
+    [...tokens].map(([name, [L, C, H]]) =>
+      `  --${name}: oklch(${L}% ${fmt(C)} ${fmt(H, 4)});`
+    ).join('\n') + '\n}\n';
   if(typeof restoreFocus==='number')document.querySelector(`[name="neutral-hue"][value="${restoreFocus}"]`).focus();
 }
 function hexRgb(hex){return hex.slice(1).match(/../g).map(v=>parseInt(v,16));}
@@ -161,6 +491,30 @@ $('#picker-hue').oninput=e=>{pickerHSV.h=Number(e.target.value);applyPicker();};
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('.hint-anchor'))closeHints();if(!e.target.closest('.hex-control')){$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.hint-anchor').forEach(a=>a.classList.add('suppressed'));closeHints();$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');document.activeElement?.blur();}});
 ['#rgb-r','#rgb-g','#rgb-b'].forEach((id,i)=>$(id).onblur=()=>{$(id).value=hexRgb(lastHex)[i];});
+const initialHex = locationParams.get('hex');
+if (/^#[a-f0-9]{6}$/i.test(initialHex ?? '')) $('#hex').value = initialHex;
+const initialNeutral = Number(locationParams.get('neutral') ?? 4);
+if (Number.isInteger(initialNeutral) && initialNeutral >= 0 && initialNeutral < 6) selectedNeutral = initialNeutral;
+const fallback = Number(locationParams.get('fallback') ?? 0);
+if (Number.isFinite(fallback) && fallback >= 0 && fallback < 360) $('#gray-hue').value = fallback;
+$('#palette-view').hidden = matrixView;
+$('#matrix').hidden = !matrixView;
+$('#matrix-link').textContent = matrixView ? 'Back to palette' : 'Color matrix';
+$('#theme-toggle').checked = activeTheme === 'dark';
+$('#theme-toggle').onchange = event => {
+  activeTheme = event.target.checked ? 'dark' : 'light';
+  blocksToken = activeTheme === 'dark' ? 'color-gray-900' : 'color-white';
+  render();
+};
 render();syncPicker();
+
+$('#export-css').addEventListener('click', () => {
+  const url = URL.createObjectURL(new Blob([exportCss], {type: 'text/css'}));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'palette.theme.css';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
 </script>
 </body></html>
