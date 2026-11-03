@@ -1,144 +1,62 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OKLCH palette</title><style>
-:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111;background:#fff;font-synthesis:none}*{box-sizing:border-box}body{margin:0}input,select{font:inherit}input,select,summary{-webkit-tap-highlight-color:transparent}.page-controls{background:#fff;padding:64px 40px 32px}.controls-inner,.theme-inner{max-width:1120px;margin:0 auto}.page-title{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:34px}h1{margin:0;font-size:30px;font-weight:550;letter-spacing:-1px}.page-title p{margin:0;font-size:12px;color:#777}.inputs{display:flex;align-items:flex-start;gap:32px}.inputs label{display:block;margin-bottom:9px;font-size:11px;color:#777}.hex-input{display:flex;align-items:center;gap:12px}#picker{height:34px;width:34px;border:0;padding:0;background:none;cursor:pointer}#picker::-webkit-color-swatch-wrapper{padding:0}#picker::-webkit-color-swatch{border:none;border-radius:0}#hex{border:0;border-bottom:1px solid #ddd;border-radius:0;background:#fff;color:#111;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:21px;letter-spacing:.2px;padding:2px 0 5px;width:150px;outline:none}#hex:focus{border-color:#111}#hex[aria-invalid=true]{border-color:#b32d2d}select{height:34px;border:0;border-bottom:1px solid #ddd;background:#fff;color:#111;border-radius:0;padding:0 25px 0 0;min-width:185px;font-size:14px}#error{margin:12px 0 0;font-size:12px;color:#b32d2d;min-height:0}#error:empty{display:none}#base-hue{font-size:11px;color:#777;margin:16px 0 0}.settings{margin-top:18px;font-size:11px;line-height:1.8;color:#777;max-width:730px}.settings summary{cursor:pointer;display:inline-block}.settings p{margin:12px 0}.settings label{color:#555}#gray-hue-label{font-size:12px;display:block;margin:12px 0}#gray-hue{width:70px;padding:4px;border:1px solid #ddd}.theme-section{padding:40px 40px 72px}.light-section{background:#fff;color:#111}.dark-section{background:#000;color:#fff}h2{font-size:17px;font-weight:500;letter-spacing:-.3px;margin:0 0 26px}.table-scroll{overflow-x:auto}table{width:100%;border-collapse:separate;border-spacing:0 16px;table-layout:fixed;margin-top:-16px}td{padding:0;vertical-align:middle;height:64px;border:0;text-align:left}.sample-col{width:96px}.function-col{width:190px}.hex-col{width:130px}.oklch-col{width:390px}.max-col{width:100px}.swatch{width:64px;height:64px;border:0;border-radius:0}.family-name{display:block;color:#858585;font-size:11px;margin-bottom:5px}.function-name{display:block;font-size:13px;font-weight:450}.hex-value,.oklch-value,.max-value{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}.hex-value,.oklch-value{user-select:all}.max-value{color:#666}.dark-section .max-value{color:#aaa}.dark-section .family-name{color:#888}.max-swatch{cursor:default}input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #777;outline-offset:4px}[hidden]{display:none!important}@media(max-width:1000px){.page-controls{padding:40px 24px 24px}.theme-section{padding:32px 24px 56px}table{min-width:630px}.sample-col{width:80px}.function-col{width:100px}.hex-col{width:80px}.oklch-col{width:218px}.max-col{width:72px}.hex-value,.oklch-value,.max-value{font-size:11px}.page-title{align-items:flex-start}}@media(max-width:560px){.page-controls{padding:28px 20px 22px}.theme-section{padding:30px 20px 48px}.page-title{display:block;margin-bottom:26px}.page-title p{margin-top:10px}.inputs{gap:22px;flex-wrap:wrap}h1{font-size:27px}#hex{width:130px;font-size:19px}select{min-width:160px;font-size:13px}.hex-value,.oklch-value,.max-value{font-size:11px}}
-
-.divider-col{width:28px}.color-divider{width:2px;height:64px}.page-controls{padding-top:40px}@media(max-width:1000px){table{min-width:658px}.divider-col{width:28px}}
-/* Compact table with details attached to each sample. */
-button,input{font:inherit}button{cursor:pointer}.swatch{border-radius:16px}button.swatch{padding:0;display:block;border:0;position:relative}.table-scroll{overflow:visible}table{max-width:820px;margin-right:auto;min-width:0}.sample-col{width:96px}.function-col{width:190px}.divider-col{width:28px}.oklch-col{width:auto}.sample-cell{position:relative}.hint-anchor{position:relative;width:64px}.color-hint{display:none;position:absolute;z-index:30;top:calc(100% + 10px);left:0;width:316px;padding:18px;background:#fff;color:#111;box-shadow:0 10px 40px #0002,0 0 0 1px #0001;border-radius:16px;font-size:12px;line-height:1.5}.color-hint::before{content:"";position:absolute;left:0;right:0;height:12px;top:-12px}.hint-anchor:has(button.swatch:focus-visible) .color-hint,.hint-anchor.pinned .color-hint{display:block}@media(hover:hover){.hint-anchor:hover .color-hint{display:block}}.hint-anchor:hover,.hint-anchor:focus-within,.hint-anchor.pinned{z-index:31}.hint-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}.hint-heading b{font-weight:550}.hint-heading>span,.hint-values>span,.max-preview span{font-size:10px;color:#888}.hint-values{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums}.hint-values code{user-select:all}.max-preview{display:flex;align-items:center;gap:16px}.max-preview code,.max-preview span{display:block}.max-preview code{font-size:12px;margin-top:3px}.hint-max{flex-shrink:0}.max-oklch{display:block;font-size:10px;margin:12px 0 18px;white-space:nowrap;user-select:all}.contrast-item{margin-top:13px}.contrast-item>span{display:flex;align-items:center;gap:6px;font-size:10px;color:#777}.contrast-item i{width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1px #8883}.contrast-item code{font-size:9px}.contrast-item b{display:block;font-size:13px;font-weight:500;margin-top:3px}.gamut-note,.hint-footnote{font-size:10px;line-height:1.6;color:#888;margin:12px 0 0}.dark-section .color-hint{background:#181818;color:#f5f5f5;box-shadow:0 10px 40px #0008,0 0 0 1px #ffffff25}.dark-section .contrast-item>span{color:#aaa}.neutral-control{border:0;padding:0;margin:0;min-width:0}.neutral-control legend{font-size:11px;color:#777;margin-bottom:9px;padding:0}.neutral-options{display:flex;gap:12px}.hue-option{position:relative;display:block!important;margin:0!important;cursor:pointer}.hue-option input{position:absolute;opacity:0;width:64px;height:64px;margin:0;cursor:pointer}.hue-option span{display:block;width:64px;height:64px;border-radius:16px;position:relative;pointer-events:none}.hue-option input:checked+span{outline:2px solid #111;outline-offset:4px}.hue-option input:checked+span:after{content:"";position:absolute;width:8px;height:8px;bottom:8px;right:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px #0003}.hue-option input:focus-visible+span{outline:2px solid #111;outline-offset:4px}.hex-control{position:relative}.hex-input{gap:10px;border:1px solid #e5e5e5;border-radius:12px;height:48px;padding:8px 10px}#input-swatch{display:block;width:24px;height:24px;border-radius:6px;flex-shrink:0}#hex{border:0;width:125px;font-size:19px;padding:0}.inputs{gap:40px;flex-wrap:wrap}#rgb-toggle{border:0;border-left:1px solid #e5e5e5;background:none;height:26px;font-size:11px;color:#666;padding:0 0 0 10px;display:flex;gap:12px;align-items:center}#rgb-toggle span{font-size:16px}#rgb-toggle[aria-expanded=true] span{transform:rotate(180deg)}.rgb-panel{position:absolute;z-index:50;top:calc(100% + 10px);left:0;width:280px;padding:16px;background:#fff;box-shadow:0 12px 40px #0002,0 0 0 1px #0001;border-radius:16px}#sv-plane{position:relative;width:248px;height:180px;border-radius:8px;background-image:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent);touch-action:none;cursor:crosshair;outline-offset:4px;overflow:hidden}#sv-marker{position:absolute;width:12px;height:12px;border:2px solid white;border-radius:50%;box-shadow:0 0 0 1px #0006;transform:translate(-50%,-50%);pointer-events:none}#picker-hue{width:100%;height:12px;border-radius:12px;background:linear-gradient(to right,red,#ff0,#0f0,#0ff,#00f,#f0f,red);appearance:none;-webkit-appearance:none;display:block;margin:0 0 16px}#picker-hue::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:15px;height:15px;border:2px solid #fff;border-radius:50%;background:transparent;box-shadow:0 0 0 1px #0005}#picker-hue::-moz-range-thumb{width:12px;height:12px;border:2px solid #fff;border-radius:50%;background:transparent;box-shadow:0 0 0 1px #0005}.picker-hue-label{margin:12px 0 7px!important;font-size:10px!important}.rgb-fields{display:flex;gap:10px}.rgb-fields label{margin:0!important;flex:1}.rgb-fields input{width:100%;display:block;border:1px solid #ddd;border-radius:7px;padding:7px;margin-top:5px;font-size:12px;appearance:textfield}.rgb-fields input::-webkit-inner-spin-button{appearance:none}.swatch:focus-visible{outline:2px solid currentColor;outline-offset:4px}@media(max-width:1000px){table{min-width:0;max-width:820px}.sample-col{width:88px}.function-col{width:145px}.divider-col{width:28px}.oklch-col{width:auto}}@media(max-width:560px){.inputs{gap:26px}.neutral-options{gap:9px}.neutral-options{display:grid;grid-template-columns:repeat(3,64px);gap:12px}.sample-col{width:80px}.function-col{width:112px}.divider-col{width:20px}.oklch-value{font-size:10px;white-space:normal;overflow-wrap:anywhere}.color-hint{width:296px}.color-divider{height:64px}.neutral-control{max-width:100%}}
-
-.hint-anchor.suppressed .color-hint{display:none!important}
-
-.hue-option input,.hue-option span{width:48px;height:48px}.hue-option span{border-radius:12px}.hue-option input:checked+span{outline:none}.hue-option input:checked+span:after{top:50%;left:50%;bottom:auto;right:auto;transform:translate(-50%,-50%)}.hue-option input:focus-visible+span{outline:none;box-shadow:inset 0 0 0 2px #ffffffaa}.neutral-options{gap:10px}@media(max-width:560px){.neutral-options{display:flex;flex-wrap:wrap;gap:8px}}
-
-#export-css {
-  margin-top: 18px;
-  padding: 9px 13px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  color: #111;
-}
-table { max-width: 960px; }
-.preview-col { width: 168px; }
-.token-examples { display: flex; flex-wrap: wrap; gap: 6px; }
-.token-examples span {
-  padding: 4px 9px;
-  border-radius: 6px;
-  font-size: 11px;
-}
-.example-fill { background: var(--preview-color); color: var(--preview-ink); }
-.example-border { border: 1px solid var(--preview-color); }
-.family-name { overflow-wrap: anywhere; }
-@media (max-width: 560px) {
-  .preview-col { width: 68px; }
-  .function-col { width: 100px; }
-}
-
 :root {
-  --gray-50: oklch(98.3% 0 0);
-  --gray-100: oklch(92.7% 0 0);
-  --gray-200: oklch(80.9% 0 0);
-  --gray-500: oklch(50% 0 0);
-  --gray-700: oklch(30.9% 0 0);
-  --gray-900: oklch(23.6% 0 0);
-  --gray-950: oklch(19.1% 0 0);
-  background: var(--gray-50);
-  color: var(--gray-950);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  color: #141414;
+  background: var(--page-blocks, #fff);
+  --panel: #f9f9f9;
+  --line: #c0c0c0;
 }
-.page-controls, .light-section, .hex-input, #hex, .rgb-panel, #export-css,
-.color-hint { background: var(--gray-50); color: var(--gray-950); }
-.dark-section, .dark-section .color-hint {
-  background: var(--gray-900);
-  color: var(--gray-50);
+:root[data-theme="dark"] {
+  color: #f9f9f9;
+  --panel: #252525;
+  --line: #636363;
 }
-.hex-input, #export-css, .rgb-fields input { border-color: var(--gray-200); }
-#matrix-link { color: inherit; margin-right: 16px; font-size: 13px; }
-.button-col { width: min(55%, 320px); }
-.token-examples { gap: 10px; }
-.token-examples button {
-  min-height: 48px;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 15px;
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, summary { font: inherit; }
+button, summary { cursor: pointer; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+[hidden] { display: none !important; }
+.page-controls, #matrix { padding-inline: 40px; }
+.page-controls { padding-top: 40px; }
+#matrix { padding-block: 32px 64px; }
+.controls-inner, .theme-inner { max-width: 1120px; margin-inline: auto; }
+.inputs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.hex-control { position: relative; margin-right: 12px; }
+.hex-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 4px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
-.example-fill { border: 1px solid var(--preview-color); }
-.example-border { color: var(--preview-color); background: transparent; }
-#palette-view .hint-anchor { width: auto; }
-.oklch-value, .family-name { display: block; margin: 3px 0; }
-#matrix { background: var(--blocks, white); }
-#matrix p { font-size: 13px; }
-.matrix-scroll { overflow-x: auto; }
-.matrix-table { min-width: 735px; max-width: none; border-spacing: 6px; }
-.matrix-table td { height: 50px; }
-.matrix-table th { text-align: left; font-size: 12px; }
-.matrix-table th:first-child { width: 85px; }
-.matrix-swatch {
-  display: block;
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  border: 1px solid #80808050;
-}
-.matrix-table .hint-anchor { width: 46px; }
-.matrix-swatch[aria-pressed="true"] { outline: 2px solid currentColor; outline-offset: 2px; }
-.hint-anchor:has(button:focus-visible) .color-hint { display: block; }
-.matrix-table .color-hint {
-  position: fixed;
-  top: var(--hint-top, 12px);
-  left: var(--hint-left, 12px);
-  width: min(286px, calc(100vw - 24px));
-  z-index: 100;
-}
-@media (max-width: 560px) {
-  .button-col { width: 48%; }
-  .token-examples button { padding-inline: 12px; }
-}
-
-.inputs .theme-toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 48px; margin: 0; color: inherit; }
-[data-theme="dark"], [data-theme="dark"] .page-controls,
-[data-theme="dark"] .hex-input, [data-theme="dark"] #hex,
-[data-theme="dark"] #export-css, [data-theme="dark"] .rgb-panel {
-  background: var(--gray-900);
-  color: var(--gray-50);
-}
-.matrix-table th:first-child { width: auto; }
-.matrix-table th:last-child { width: 170px; }
-.matrix-table td:last-child { font-size: 12px; }
-.matrix-swatch[aria-pressed="true"] { outline: none; }
-.matrix-swatch[aria-pressed="true"]::after {
-  content: '';
-  display: block;
-  width: 7px;
-  height: 7px;
-  margin: auto;
-  border-radius: 50%;
-  background: currentColor;
-}
-.matrix-swatch:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
-
-:root, :root[data-theme], :root[data-theme] .page-controls,
-.light-section, .dark-section { background: var(--page-blocks, #fff); }
-#matrix { padding-top: 48px; }
-.matrix-table { margin-top: 0; }
-.matrix-table thead th {
-  padding: 8px 0;
-  color: inherit;
-  overflow-wrap: anywhere;
-}
-.token-description { margin: 5px 0 0; font-size: 12px; overflow-wrap: anywhere; }
-
-#rgb-toggle, .inputs .theme-toggle {
-  display: grid;
-  place-items: center;
-  color: var(--control-ink, currentColor);
+#input-swatch { width: 24px; height: 24px; border-radius: 6px; flex: none; }
+#hex {
+  width: 8ch;
   border: 0;
   background: transparent;
-  padding: 0;
+  color: inherit;
+  font: 19px ui-monospace, monospace;
+}
+#hex[aria-invalid="true"], #error { color: var(--control-ink, currentColor); }
+#error:empty { display: none; }
+#gray-hue-label, #error { font-size: 13px; }
+#gray-hue { width: 6ch; }
+#rgb-toggle, .theme-toggle, .downloads summary {
+  display: grid;
+  place-items: center;
   width: 44px;
   height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--control-ink, currentColor);
 }
-#rgb-toggle svg, .theme-toggle svg {
+.inputs svg {
   width: 24px;
   height: 24px;
   fill: none;
@@ -147,28 +65,139 @@ table { max-width: 960px; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-#rgb-toggle[aria-expanded=true] svg { transform: rotate(180deg); }
-.wcag-col { width: 112px; }
-.wcag-cell { font-size: 11px; font-variant-numeric: tabular-nums; padding-left: 6px; }
-.wcag-cell span { display: block; margin: 4px 0; }
-@media (hover: hover) {
-  #palette-view tr:hover .token-examples { --preview-color: var(--preview-max) !important; }
+#rgb-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.rgb-panel, .download-options, .color-hint {
+  background: var(--panel);
+  box-shadow: 0 10px 32px #0003;
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
-.matrix-swatch { border: 0; }
-.matrix-table { min-width: 940px; }
-.matrix-table .matrix-index { width: 62px; }
-.matrix-table .matrix-color { width: 62px; }
-.matrix-table .matrix-function { width: 84px; font-size: 12px; }
+.rgb-panel, .download-options {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+}
+.rgb-panel { left: 0; width: min(280px, calc(100vw - 40px)); padding: 16px; }
+#sv-plane {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  border-radius: 8px;
+  background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+  touch-action: none;
+  cursor: crosshair;
+  overflow: hidden;
+}
+#sv-marker {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #0006;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.picker-hue-label { display: block; margin-block: 10px 6px; font-size: 11px; }
+#picker-hue {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin: 0 0 16px;
+  border-radius: 12px;
+  appearance: none;
+  background: linear-gradient(to right, red, #ff0, #0f0, #0ff, #00f, #f0f, red);
+}
+#picker-hue::-webkit-slider-thumb {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 0 1px #0005;
+}
+#picker-hue::-moz-range-thumb { border: 2px solid #fff; border-radius: 50%; background: transparent; }
+.rgb-fields { display: flex; gap: 10px; font-size: 12px; }
+.rgb-fields label { flex: 1; min-width: 0; }
+.rgb-fields input {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: inherit;
+  background: transparent;
+}
+.neutral-control { border: 0; padding: 0; margin: 0; min-width: 0; }
+.neutral-options { display: grid; grid-template-columns: repeat(6, 48px); gap: 6px; }
+.hue-option { position: relative; cursor: pointer; }
+.hue-option input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; }
+.hue-option span { display: grid; place-items: center; height: 48px; border-radius: 12px; }
+.hue-option input:focus-visible + span { outline: 2px solid currentColor; outline-offset: 2px; }
+.hue-option input:checked + span::after,
+.matrix-swatch[aria-pressed="true"]::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.hue-option input:checked + span::after { background: #fff; box-shadow: 0 0 0 1px #0005; }
+.downloads { position: relative; }
+.downloads summary::-webkit-details-marker { display: none; }
+.download-options { right: 0; padding: 4px; }
+.download-options button { border: 0; padding: 10px 14px; background: transparent; color: inherit; }
+h2 { font-size: 17px; margin: 0; }
+#blocks-label { font-size: 12px; margin-block: 8px 14px; }
+.matrix-scroll { overflow-x: auto; }
+.matrix-table {
+  width: 100%;
+  min-width: 680px;
+  border-spacing: 6px;
+  table-layout: fixed;
+}
+.matrix-table td { text-align: left; vertical-align: top; padding: 0; }
+.matrix-function { font-size: 12px; line-height: 1.3; }
+.matrix-swatch {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--sample);
+  color: var(--sample-ink);
+}
+.matrix-swatch:focus-visible { outline-color: var(--control-ink); outline-offset: -2px; }
+.hint-anchor.pinned .matrix-swatch, .matrix-swatch:focus-visible { background: var(--sample-max); }
+@media (hover: hover) {
+  .matrix-swatch:hover { background: var(--sample-max); }
+  .hint-anchor:hover .color-hint { display: block; }
+}
+.color-hint {
+  display: none;
+  position: fixed;
+  top: var(--hint-top, 12px);
+  left: var(--hint-left, 12px);
+  width: min(286px, calc(100vw - 24px));
+  z-index: 30;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.color-hint p { margin: 8px 0 0; }
+.hint-anchor:has(button:focus-visible) .color-hint, .hint-anchor.pinned .color-hint { display: block; }
+.hint-anchor.suppressed .color-hint { display: none !important; }
 @media (max-width: 560px) {
-  .inputs { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 12px 8px; }
-  .hex-control { grid-column: 1 / -1; justify-self: start; }
-  .neutral-options { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
-  .hue-option span, .hue-option input { width: 100%; height: 44px; }
-  .button-col { width: 84px; }
-  .wcag-col { width: 82px; }
-  .token-examples { gap: 4px; }
-  .token-examples button { padding-inline: 8px; font-size: 12px; min-height: 44px; }
-  .token-description { font-size: 11px; }
+  .page-controls, #matrix { padding-inline: 20px; }
+  .page-controls { padding-top: 24px; }
+  .inputs { display: grid; grid-template-columns: minmax(0, 1fr) 44px 44px; gap: 8px 4px; }
+  .hex-control { grid-column: 1 / -1; justify-self: start; margin-right: 0; }
+  .neutral-options { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+  .hue-option span { height: 44px; }
 }
 </style></head>
 <body>
@@ -184,28 +213,25 @@ table { max-width: 960px; }
       </div>
       <fieldset class="neutral-control" aria-label="Neutral hue"><div id="neutral-options" class="neutral-options"></div></fieldset>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/></svg></button>
+      <details class="downloads">
+        <summary aria-label="Download palette"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg></summary>
+        <div class="download-options"><button id="export-css" type="button">Tailwind</button></div>
+      </details>
     </div>
-    <a id="matrix-link" href="?view=matrix">Color matrix</a>
-    <button id="export-css" type="button">Download Tailwind CSS</button>
     <p id="error" role="status"></p>
     <label id="gray-hue-label" hidden>Reference RGB hue <input id="gray-hue" type="number" min="0" max="359" value="0"></label>
 
   </div>
 </header>
-<main id="palette-view">
-  <section class="theme-section light-section" aria-labelledby="light-title"><div class="theme-inner"><h2 id="light-title">Light theme</h2><div class="table-scroll"><table aria-label="Light palette: color details, role, OKLCH, and examples"><colgroup><col class="button-col"><col><col class="wcag-col"></colgroup><tbody id="light-rows"></tbody></table></div></div></section>
-  <section class="theme-section dark-section" aria-labelledby="dark-title"><div class="theme-inner"><h2 id="dark-title">Dark theme</h2><div class="table-scroll"><table aria-label="Dark palette: color details, role, OKLCH, and examples"><colgroup><col class="button-col"><col><col class="wcag-col"></colgroup><tbody id="dark-rows"></tbody></table></div></div></section>
-</main>
-<section id="matrix" class="theme-section" hidden aria-labelledby="matrix-title">
+<main id="matrix" aria-labelledby="matrix-title">
   <div class="theme-inner">
     <h2 id="matrix-title">Color matrix</h2>
     <p id="blocks-label" aria-live="polite"></p>
-    <p>Select the white or gray-900 Blocks swatch to change the background.</p>
     <div class="matrix-scroll">
-      <table class="matrix-table"><thead><tr id="matrix-head"></tr></thead><tbody id="matrix-rows"></tbody></table>
+      <table class="matrix-table" aria-labelledby="matrix-title"><tbody id="matrix-rows"></tbody></table>
     </div>
   </div>
-</section>
+</main>
 <script>
 const mod=x=>(x%360+360)%360;
 const anchors=[[0,0],[60,30],[120,60],[180,120],[240,240],[300,270],[360,360]];
@@ -288,9 +314,8 @@ if(typeof module!=='undefined')module.exports={mod,mapHue,hslRgb,rgbHue,toOklch,
 const graySteps = [[50, 98.3], [100, 92.7], [200, 80.9], [300, 69.1], [400, 57.3], [500, 50], [600, 42.7], [700, 30.9], [800, 26.4], [900, 23.6], [950, 19.1]];
 let exportCss = '';
 const locationParams = new URLSearchParams(location.search);
-const matrixView = locationParams.get('view') === 'matrix';
 let activeTheme = locationParams.get('theme') === 'dark' ? 'dark' : 'light';
-let blocksToken = activeTheme === 'dark' ? 'color-gray-900' : 'color-white';
+const blocksForTheme = {light: 'color-white', dark: 'color-gray-900'};
 
 const $=s=>document.querySelector(s);
 const fmt=(n,p=6)=>Number(n.toFixed(p)).toString();
@@ -298,33 +323,6 @@ const ok=(L,C,H)=>`oklch(${fmt(L)} ${fmt(C)} ${fmt(H,4)})`;
 let selectedNeutral=4,lastHex='#EF3340',rowId=0,pickerHSV={h:0,s:1,v:1};
 const recipeHex=v=>colorValues(v.L,v.C,v.H).hex;
 const ratioText=(a,b)=>{const r=contrastRatio(a,b);return `${r.toFixed(2)}:1 · ${r>=7?'AAA':r>=4.5?'AA':'Below AA'}`;};
-function tokenRow({role,L,C,H},token,background,alert,tintedInk){
-  const utility = token.slice(6);
-  const row = document.createElement('tr');
-  const sample = colorValues(L, C, H);
-  row.innerHTML = `<td aria-label="Color examples">
-    <div class="token-examples" style="--preview-color:${ok(L,C,H)};--preview-max:${ok(L, maxChroma(L, H), H)};--preview-ink:${tintedInk ?? background}">
-      <button type="button" class="example-fill bg-${utility}" title="bg-${utility}">Filled</button>
-      <button type="button" class="example-border border-${utility} text-${utility}" title="border-${utility} text-${utility}">Outline</button>
-    </div>
-  </td><td aria-label="Color token">
-    <code class="oklch-value">${ok(L,C,H)}</code>
-    <p class="token-description"><code>${token}</code> · ${role}</p>
-  </td><td class="wcag-cell" aria-label="WCAG contrast against Blocks and Alerts">
-    <span>Blocks ${contrastRatio(sample.hex, background).toFixed(2)}:1</span>
-    <span>Alerts ${contrastRatio(sample.hex, alert).toFixed(2)}:1</span>
-  </td>`;
-  row.cells[0].prepend(makeColorHint(token, [L * 100, C, H], sample.hex, background, alert, false));
-  const anchor = row.cells[0].firstElementChild;
-  const examples = row.querySelector('.token-examples');
-  anchor.prepend(examples);
-  anchor.querySelector('.matrix-swatch').remove();
-  examples.querySelectorAll('button').forEach(button => {
-    button.setAttribute('aria-describedby', anchor.querySelector('.color-hint').id);
-    button.onclick = () => toggleHint(anchor);
-  });
-  return row;
-}
 function closeHints() {
   document.querySelectorAll('.hint-anchor.pinned').forEach(anchor => anchor.classList.remove('pinned'));
 }
@@ -334,13 +332,15 @@ function toggleHint(anchor) {
   anchor.classList.remove('suppressed');
   anchor.classList.toggle('pinned', !pinned);
 }
-function makeColorHint(name, [lightness, chroma, hue], hex, background, alert, isBlocks) {
+function makeColorHint(name, [lightness, chroma, hue], background, alert, isBlocks) {
   const L = lightness / 100;
-  const maximum = maxChroma(L, hue);
+  const {hex, max: maximum} = colorValues(L, chroma, hue);
+  const preview = hexFor(L, maximum, hue);
+  const ink = L >= .6 ? "#141414" : "#f9f9f9";
   const id = `hint-${rowId++}`;
   const anchor = document.createElement('div');
   anchor.className = 'hint-anchor';
-  anchor.innerHTML = `<button type="button" class="matrix-swatch" style="background:${hex}"
+  anchor.innerHTML = `<button type="button" class="matrix-swatch" style="--sample:${hex};--sample-max:${preview};--sample-ink:${ink}"
       aria-label="${name}${isBlocks ? ' — use as Blocks background' : ''}" aria-describedby="${id}"></button>
     <div id="${id}" class="color-hint" role="tooltip">
       <b>--${name}</b>
@@ -359,96 +359,89 @@ function makeColorHint(name, [lightness, chroma, hue], hex, background, alert, i
   anchor.onpointerenter = positionHint;
   anchor.onfocusin = positionHint;
   anchor.onpointerleave = () => anchor.classList.remove('suppressed');
-  anchor.querySelector('button').onclick = () => toggleHint(anchor);
+  anchor.querySelector('button').onclick = () => {
+    toggleHint(anchor);
+    positionHint();
+  };
   return anchor;
 }
-function renderMatrix(tokens, original, roles) {
+function renderMatrix(tokens, original, families, roles, alerts) {
+  const blocksToken = blocksForTheme[activeTheme];
   const [L, C, H] = tokens.get(blocksToken);
   const background = recipeHex({L: L / 100, C, H});
-  const surface = $('#matrix');
-  surface.style.setProperty('--blocks', background);
-  surface.style.color = contrastRatio(background, '#000000') >= contrastRatio(background, '#FFFFFF') ? '#000' : '#fff';
+  document.documentElement.style.setProperty('--page-blocks', background);
 
-  const families = [...new Set([...tokens.keys()]
-    .filter(name => name !== 'color-white')
-    .map(name => name.replace(/-\d+$/, '')))];
-  const neutralFamilies = families.slice(0, 2);
-  const colorFamilies = families.slice(2);
-  const themes = ['light', 'dark'];
-  const functionColumns = ['Light function', 'Dark function'];
-  const columns = ['Tailwind index', 'Gray', 'Neutral', ...functionColumns,
-    ...colorFamilies.map(name => name.slice(6)), ...functionColumns];
-  $('#matrix-head').replaceChildren(...columns.map((label, i) => {
-    const cell = document.createElement('th');
-    cell.scope = 'col';
-    cell.textContent = label;
-    cell.className = label.endsWith('function') ? 'matrix-function' : i === 0 ? 'matrix-index' : 'matrix-color';
-    return cell;
-  }));
-
-  function appendFunctions(row, names) {
-    for (const theme of themes) {
-      const cell = row.insertCell();
-      cell.className = 'matrix-function';
-      cell.textContent = [...new Set(names.flatMap(name => [...(roles[theme].get(name) ?? [])]))].join(', ') || '—';
-    }
+  function appendFunction(row, names) {
+    const cell = row.insertCell();
+    cell.className = 'matrix-function';
+    cell.textContent = [...new Set(names.map(name => roles.get(name)).filter(Boolean))].join(', ');
   }
 
   const rows = graySteps.map(([step]) => {
     const row = document.createElement('tr');
-    const index = document.createElement('th');
-    index.scope = 'row';
-    index.textContent = step;
-    row.append(index);
-    for (const group of [neutralFamilies, colorFamilies]) {
+    for (const group of [['color-gray', 'color-neutral'], families]) {
       const names = group.map(family => `${family}-${step}`);
       for (const name of names) {
         const cell = row.insertCell();
         const value = tokens.get(name);
-        if (value) {
-          const [L, C, H] = value;
-          cell.append(matrixSample(name, value, recipeHex({L: L / 100, C, H}), background));
-        }
+        if (value) cell.append(matrixSample(name, value, background, alerts.get(name)));
       }
-      appendFunctions(row, names);
+      appendFunction(row, names);
     }
     return row;
   });
-  for (const [name, value, hex, label] of [
-    ['color-white', tokens.get('color-white'), '#FFFFFF', 'White'],
-    ['my-brand-color', [original[0] * 100, original[1], original[2]], lastHex, 'Brand'],
+
+  for (const [name, value, label] of [
+    ['color-white', tokens.get('color-white'), roles.get('color-white')],
+    ['my-brand-color', [original[0] * 100, original[1], original[2]], 'Brand'],
   ]) {
     const row = document.createElement('tr');
-    row.insertCell().textContent = label;
-    row.insertCell().append(matrixSample(name, value, hex, background));
+    row.insertCell().append(matrixSample(name, value, background, alerts.get(name)));
     row.insertCell();
-    appendFunctions(row, [name]);
-    row.insertCell().colSpan = colorFamilies.length + 2;
+    const cell = row.insertCell();
+    cell.className = 'matrix-function';
+    cell.textContent = label ?? '';
+    row.insertCell().colSpan = families.length + 1;
     rows.push(row);
   }
   $('#matrix-rows').replaceChildren(...rows);
   $('#blocks-label').textContent = `Blocks background: --${blocksToken}`;
 }
-function matrixSample(name, value, hex, background) {
+
+function matrixSample(name, value, background, alert) {
   const isBlocks = name === 'color-white' || name === 'color-gray-900';
-  const anchor = makeColorHint(name, value, hex, background, null, isBlocks);
+  const anchor = makeColorHint(name, value, background, alert, isBlocks);
   if (isBlocks) {
     const button = anchor.querySelector('button');
+    const theme = name === 'color-white' ? 'light' : 'dark';
     button.dataset.blocks = name;
-    button.setAttribute('aria-pressed', String(name === blocksToken));
+    button.setAttribute('aria-pressed', String(name === blocksForTheme[activeTheme]));
     button.onclick = () => {
-      blocksToken = name;
-      render();
+      if (activeTheme === theme) {
+        toggleHint(anchor);
+        return;
+      }
+      setTheme(theme);
       document.querySelector(`[data-blocks="${name}"]`).focus();
     };
   }
   return anchor;
 }
+
 function render(restoreFocus){
-  let value=$('#hex').value.trim();
-  if(!/^#?(?:[a-f\d]{3}|[a-f\d]{6})$/i.test(value)){$('#error').textContent='Enter a HEX color, e.g. #EF3340 or #ABC';$('#hex').setAttribute('aria-invalid','true');return;}
-  $('#error').textContent='';$('#hex').removeAttribute('aria-invalid');value=value.replace('#','');if(value.length===3)value=[...value].map(c=>c+c).join('');
-  const rgb=value.match(/../g).map(v=>parseInt(v,16)/255);lastHex='#'+value.toUpperCase();$('#input-swatch').style.background=lastHex;
+  const input = $('#hex');
+  const value = input.value.trim();
+  const valid = /^#?(?:[a-f\d]{3}|[a-f\d]{6})$/i.test(value);
+  $('#error').textContent = valid ? '' : 'Enter a HEX color, e.g. #EF3340 or #ABC';
+  if (valid) {
+    input.removeAttribute('aria-invalid');
+    const digits = value.replace('#', '').toUpperCase();
+    lastHex = '#' + (digits.length === 3 ? [...digits].map(c => c + c).join('') : digits);
+  } else {
+    input.setAttribute('aria-invalid', 'true');
+  }
+  const rgb = hexRgb(lastHex).map(channel => channel / 255);
+  $('#input-swatch').style.background = lastHex;
   const rgbH=rgbHue(rgb),original=toOklch(rgb);
   const hues=generateHues(rgb,{fallback:Number($('#gray-hue').value)||0}).map(x=>({...x,family:colorFamily(x.h)}));
   $('#neutral-options').innerHTML=hues.map((x,i)=>{const C=maxChroma(.691,x.h),hex=hexFor(.691,C,x.h);return `<label class="hue-option" title="${x.family.name} · ${fmt(x.h,2)}° · ${ok(.691,C,x.h)}"><input type="radio" name="neutral-hue" value="${i}" ${i===selectedNeutral?'checked':''} aria-label="${x.family.name} ${fmt(x.h,1)}°"><span style="background:${hex}"></span></label>`;}).join('');
@@ -479,56 +472,33 @@ function render(restoreFocus){
     return {h, prefix};
   });
 
-  const roles = {light: new Map(), dark: new Map()};
-  function recordRole(theme, token, role) {
-    const themeRoles = roles[theme];
-    if (!themeRoles.has(token)) themeRoles.set(token, new Set());
-    themeRoles.get(token).add(role);
+  const roles = new Map();
+  const alerts = new Map();
+  const neutralAlert = recipeHex(colorRecipe(activeTheme, H, false)[2]);
+  tokens.set('color-white', [100, 0, 0]);
+  for (const {L, C, role} of neutralRecipe(activeTheme, H)) {
+    const lightness = Number((L * 100).toFixed(2));
+    const step = graySteps.find(([, level]) => level === lightness)?.[0];
+    const token = L === 1 ? 'color-white' : `color-${C ? 'neutral' : 'gray'}-${step}`;
+    roles.set(token, role);
   }
-  for (const theme of ['light', 'dark']) {
-    const neutrals = neutralRecipe(theme, H);
-    const background = recipeHex(neutrals[1]);
-    const neutralAlert = recipeHex(colorRecipe(theme, H, false)[2]);
-    const rows = neutrals.map(value => {
-      if (value.L === .983 && value.C) value = {...value, C: .00243};
-      const lightness = Number((value.L * 100).toFixed(2));
-      const step = graySteps.find(([, level]) => level === lightness)?.[0];
-      const scale = value.C ? 'neutral' : 'gray';
-      const token = lightness === 100 ? 'color-white' : `color-${scale}-${step}`;
-      tokens.set(token, [lightness, value.C, value.H]);
-      recordRole(theme, token, value.role);
-      return tokenRow(value, token, background, neutralAlert);
-    });
-    for (const {h, prefix} of palettes) {
-      const recipes = colorRecipe(theme, h, false);
-      const colorfulStep = recipes[1].L === .691 ? 500 : 600;
-      const steps = theme === 'light' ? [800, colorfulStep, 50] : [200, 500, 950];
-      const values = steps.map((step, i) => {
-        const token = `${prefix}-${step}`;
-        const [lightness, C, H] = tokens.get(token);
-        return {token, value: {role: recipes[i].role, L: lightness / 100, C, H}};
-      });
-      const alert = recipeHex(values[2].value);
-      rows.push(...values.map(({token, value}) => {
-        recordRole(theme, token, value.role);
-        return tokenRow(value, token, background, alert, value.role === 'Alerts' ? ok(values[0].value.L, values[0].value.C, h) : undefined);
-      }));
-    }
-    $(`#${theme}-title`).closest('section').hidden = theme !== activeTheme;
-    $(`#${theme}-rows`).replaceChildren(...(theme === activeTheme ? rows : []));
+  for (const token of tokens.keys()) {
+    if (/^color-(gray-|neutral-|white$)/.test(token)) alerts.set(token, neutralAlert);
   }
-  const params = new URLSearchParams({hex: lastHex, neutral: selectedNeutral, fallback: $('#gray-hue').value});
-  params.set('view', matrixView ? 'palette' : 'matrix');
-  params.set('theme', activeTheme);
+  for (const {h, prefix} of palettes) {
+    const recipes = colorRecipe(activeTheme, h, false);
+    const colorfulStep = recipes[1].L === .691 ? 500 : 600;
+    const steps = activeTheme === 'light' ? [800, colorfulStep, 50] : [200, 500, 950];
+    const [L, C, H] = tokens.get(`${prefix}-${steps[2]}`);
+    const alert = recipeHex({L: L / 100, C, H});
+    for (const [i, step] of steps.entries()) roles.set(`${prefix}-${step}`, recipes[i].role);
+    for (const step of [50, 200, 500, 600, 800, 950]) alerts.set(`${prefix}-${step}`, alert);
+  }
   const [tinted] = colorRecipe(activeTheme, H, false);
   document.documentElement.style.setProperty('--control-ink', ok(tinted.L, tinted.C, H));
   $('#theme-toggle').setAttribute('aria-pressed', String(activeTheme === 'dark'));
   document.documentElement.dataset.theme = activeTheme;
-  document.documentElement.style.setProperty('--page-blocks', matrixView
-    ? recipeHex({L: tokens.get(blocksToken)[0] / 100, C: 0, H: 0})
-    : recipeHex(neutralRecipe(activeTheme, H)[1]));
-  $('#matrix-link').href = `?${params}`;
-  if (matrixView) renderMatrix(tokens, original, roles);
+  renderMatrix(tokens, original, palettes.map(({prefix}) => prefix), roles, alerts);
   exportCss = `:root {\n  --my-brand-color: ${lastHex};\n}\n\n@theme static {\n` +
     [...tokens].map(([name, [L, C, H]]) =>
       `  --${name}: oklch(${L}% ${fmt(C)} ${fmt(H, 4)});`
@@ -550,8 +520,8 @@ $('#sv-plane').onpointerup=e=>{if($('#sv-plane').hasPointerCapture(e.pointerId))
 $('#sv-plane').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const step=e.shiftKey?.1:.01;if(e.key==='ArrowLeft')pickerHSV.s=Math.max(0,pickerHSV.s-step);if(e.key==='ArrowRight')pickerHSV.s=Math.min(1,pickerHSV.s+step);if(e.key==='ArrowUp')pickerHSV.v=Math.min(1,pickerHSV.v+step);if(e.key==='ArrowDown')pickerHSV.v=Math.max(0,pickerHSV.v-step);applyPicker();};
 $('#picker-hue').oninput=e=>{pickerHSV.h=Number(e.target.value);applyPicker();};
 ['#rgb-r','#rgb-g','#rgb-b'].forEach(id=>$(id).oninput=()=>{const nums=['#rgb-r','#rgb-g','#rgb-b'].map(s=>Math.round(Math.max(0,Math.min(255,Number($(s).value)))));$('#hex').value='#'+nums.map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();render();syncPicker();});
-document.addEventListener('pointerdown',e=>{if(!e.target.closest('.hint-anchor'))closeHints();if(!e.target.closest('.hex-control')){$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.hint-anchor').forEach(a=>a.classList.add('suppressed'));closeHints();$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');document.activeElement?.blur();}});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.downloads'))$('.downloads').open=false;if(!e.target.closest('.hint-anchor'))closeHints();if(!e.target.closest('.hex-control')){$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('.downloads').open){$('.downloads').open=false;$('.downloads summary').focus();return;}document.querySelectorAll('.hint-anchor').forEach(a=>a.classList.add('suppressed'));closeHints();$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');document.activeElement?.blur();}});
 ['#rgb-r','#rgb-g','#rgb-b'].forEach((id,i)=>$(id).onblur=()=>{$(id).value=hexRgb(lastHex)[i];});
 const initialHex = locationParams.get('hex');
 if (/^#[a-f0-9]{6}$/i.test(initialHex ?? '')) $('#hex').value = initialHex;
@@ -559,17 +529,17 @@ const initialNeutral = Number(locationParams.get('neutral') ?? 4);
 if (Number.isInteger(initialNeutral) && initialNeutral >= 0 && initialNeutral < 6) selectedNeutral = initialNeutral;
 const fallback = Number(locationParams.get('fallback') ?? 0);
 if (Number.isFinite(fallback) && fallback >= 0 && fallback < 360) $('#gray-hue').value = fallback;
-$('#palette-view').hidden = matrixView;
-$('#matrix').hidden = !matrixView;
-$('#matrix-link').textContent = matrixView ? 'Back to palette' : 'Color matrix';
-$('#theme-toggle').onclick = () => {
-  activeTheme = activeTheme === 'dark' ? 'light' : 'dark';
-  blocksToken = activeTheme === 'dark' ? 'color-gray-900' : 'color-white';
+function setTheme(theme) {
+  activeTheme = theme;
   render();
-};
+}
+
+$('#theme-toggle').onclick = () => setTheme(activeTheme === 'dark' ? 'light' : 'dark');
 render();syncPicker();
 
 $('#export-css').addEventListener('click', () => {
+  $('.downloads').open = false;
+  $('.downloads summary').focus();
   const url = URL.createObjectURL(new Blob([exportCss], {type: 'text/css'}));
   const link = document.createElement('a');
   link.href = url;
