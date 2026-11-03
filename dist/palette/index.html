@@ -136,8 +136,7 @@ button, summary { cursor: pointer; }
 .hue-option input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; }
 .hue-option span { display: grid; place-items: center; height: 48px; border-radius: 12px; }
 .hue-option input:focus-visible + span { outline: 2px solid currentColor; outline-offset: 2px; }
-.hue-option input:checked + span::after,
-.matrix-swatch[aria-pressed="true"]::after {
+.hue-option input:checked + span::after {
   content: "";
   width: 7px;
   height: 7px;
@@ -158,22 +157,23 @@ h2 { font-size: 17px; margin: 0; }
   border-spacing: 6px;
   table-layout: fixed;
 }
-.matrix-table td { text-align: left; vertical-align: top; padding: 0; }
+.matrix-table td { text-align: center; vertical-align: middle; padding: 0; }
 .matrix-function { font-size: 12px; line-height: 1.3; }
+.hint-anchor { display: grid; gap: 4px; --preview: var(--sample); }
 .matrix-swatch {
-  display: grid;
-  place-items: center;
   width: 100%;
   min-height: 44px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--sample);
-  color: var(--sample-ink);
+  padding: 4px;
+  border: 1px solid var(--preview);
+  border-radius: 10px;
+  font-size: 11px;
 }
-.matrix-swatch:focus-visible { outline-color: var(--control-ink); outline-offset: -2px; }
-.hint-anchor.pinned .matrix-swatch, .matrix-swatch:focus-visible { background: var(--sample-max); }
+.sample-outline { background: transparent; color: var(--preview); }
+.sample-filled { background: var(--preview); color: var(--sample-ink); }
+.matrix-swatch:focus-visible { outline-color: var(--control-ink); outline-offset: -3px; }
+.hint-anchor.pinned, .hint-anchor:has(button:focus-visible) { --preview: var(--sample-max); }
 @media (hover: hover) {
-  .matrix-swatch:hover { background: var(--sample-max); }
+  .hint-anchor:has(button:hover) { --preview: var(--sample-max); }
   .hint-anchor:hover .color-hint { display: block; }
 }
 .color-hint {
@@ -332,16 +332,19 @@ function toggleHint(anchor) {
   anchor.classList.remove('suppressed');
   anchor.classList.toggle('pinned', !pinned);
 }
-function makeColorHint(name, [lightness, chroma, hue], background, alert, isBlocks) {
+function makeColorHint(name, [lightness, chroma, hue], background, alert, isBlocks, tintedInk) {
   const L = lightness / 100;
   const {hex, max: maximum} = colorValues(L, chroma, hue);
   const preview = hexFor(L, maximum, hue);
-  const ink = L >= .6 ? "#141414" : "#f9f9f9";
   const id = `hint-${rowId++}`;
   const anchor = document.createElement('div');
   anchor.className = 'hint-anchor';
-  anchor.innerHTML = `<button type="button" class="matrix-swatch" style="--sample:${hex};--sample-max:${preview};--sample-ink:${ink}"
-      aria-label="${name}${isBlocks ? ' — use as Blocks background' : ''}" aria-describedby="${id}"></button>
+  anchor.style.cssText = `--sample:${hex};--sample-max:${preview};--sample-ink:${tintedInk ?? background}`;
+  const label = name + (isBlocks ? ' — use as Blocks background' : '');
+  anchor.innerHTML = `<button type="button" class="matrix-swatch sample-outline"
+      aria-label="${label}, Outline" aria-describedby="${id}">Outline</button>
+    <button type="button" class="matrix-swatch sample-filled"
+      aria-label="${label}, Filled" aria-describedby="${id}">Filled</button>
     <div id="${id}" class="color-hint" role="tooltip">
       <b>--${name}</b>
       <p><code>oklch(${fmt(lightness)}% ${fmt(chroma)} ${fmt(hue,4)})</code></p>
@@ -359,13 +362,15 @@ function makeColorHint(name, [lightness, chroma, hue], background, alert, isBloc
   anchor.onpointerenter = positionHint;
   anchor.onfocusin = positionHint;
   anchor.onpointerleave = () => anchor.classList.remove('suppressed');
-  anchor.querySelector('button').onclick = () => {
-    toggleHint(anchor);
-    positionHint();
-  };
+  for (const button of anchor.querySelectorAll('button')) {
+    button.onclick = () => {
+      toggleHint(anchor);
+      positionHint();
+    };
+  }
   return anchor;
 }
-function renderMatrix(tokens, original, families, roles, alerts) {
+function renderMatrix(tokens, original, families, roles, alerts, alertInk) {
   const blocksToken = blocksForTheme[activeTheme];
   const [L, C, H] = tokens.get(blocksToken);
   const background = recipeHex({L: L / 100, C, H});
@@ -384,7 +389,7 @@ function renderMatrix(tokens, original, families, roles, alerts) {
       for (const name of names) {
         const cell = row.insertCell();
         const value = tokens.get(name);
-        if (value) cell.append(matrixSample(name, value, background, alerts.get(name)));
+        if (value) cell.append(matrixSample(name, value, background, alerts.get(name), alertInk.get(name)));
       }
       appendFunction(row, names);
     }
@@ -396,7 +401,7 @@ function renderMatrix(tokens, original, families, roles, alerts) {
     ['my-brand-color', [original[0] * 100, original[1], original[2]], 'Brand'],
   ]) {
     const row = document.createElement('tr');
-    row.insertCell().append(matrixSample(name, value, background, alerts.get(name)));
+    row.insertCell().append(matrixSample(name, value, background, alerts.get(name), alertInk.get(name)));
     row.insertCell();
     const cell = row.insertCell();
     cell.className = 'matrix-function';
@@ -408,22 +413,23 @@ function renderMatrix(tokens, original, families, roles, alerts) {
   $('#blocks-label').textContent = `Blocks background: --${blocksToken}`;
 }
 
-function matrixSample(name, value, background, alert) {
+function matrixSample(name, value, background, alert, tintedInk) {
   const isBlocks = name === 'color-white' || name === 'color-gray-900';
-  const anchor = makeColorHint(name, value, background, alert, isBlocks);
+  const anchor = makeColorHint(name, value, background, alert, isBlocks, tintedInk);
   if (isBlocks) {
-    const button = anchor.querySelector('button');
-    const theme = name === 'color-white' ? 'light' : 'dark';
-    button.dataset.blocks = name;
-    button.setAttribute('aria-pressed', String(name === blocksForTheme[activeTheme]));
-    button.onclick = () => {
-      if (activeTheme === theme) {
-        toggleHint(anchor);
-        return;
-      }
-      setTheme(theme);
-      document.querySelector(`[data-blocks="${name}"]`).focus();
-    };
+    for (const button of anchor.querySelectorAll('button')) {
+      const theme = name === 'color-white' ? 'light' : 'dark';
+      button.dataset.blocks = name;
+      button.setAttribute('aria-pressed', String(name === blocksForTheme[activeTheme]));
+      button.onclick = () => {
+        if (activeTheme === theme) {
+          toggleHint(anchor);
+          return;
+        }
+        setTheme(theme);
+        document.querySelector(`[data-blocks="${name}"].${button.classList[1]}`).focus();
+      };
+    }
   }
   return anchor;
 }
@@ -474,6 +480,7 @@ function render(restoreFocus){
 
   const roles = new Map();
   const alerts = new Map();
+  const alertInk = new Map();
   const neutralAlert = recipeHex(colorRecipe(activeTheme, H, false)[2]);
   tokens.set('color-white', [100, 0, 0]);
   for (const {L, C, role} of neutralRecipe(activeTheme, H)) {
@@ -491,6 +498,8 @@ function render(restoreFocus){
     const steps = activeTheme === 'light' ? [800, colorfulStep, 50] : [200, 500, 950];
     const [L, C, H] = tokens.get(`${prefix}-${steps[2]}`);
     const alert = recipeHex({L: L / 100, C, H});
+    const [textL, textC, textH] = tokens.get(`${prefix}-${steps[0]}`);
+    alertInk.set(`${prefix}-${steps[2]}`, recipeHex({L: textL / 100, C: textC, H: textH}));
     for (const [i, step] of steps.entries()) roles.set(`${prefix}-${step}`, recipes[i].role);
     for (const step of [50, 200, 500, 600, 800, 950]) alerts.set(`${prefix}-${step}`, alert);
   }
@@ -498,7 +507,7 @@ function render(restoreFocus){
   document.documentElement.style.setProperty('--control-ink', ok(tinted.L, tinted.C, H));
   $('#theme-toggle').setAttribute('aria-pressed', String(activeTheme === 'dark'));
   document.documentElement.dataset.theme = activeTheme;
-  renderMatrix(tokens, original, palettes.map(({prefix}) => prefix), roles, alerts);
+  renderMatrix(tokens, original, palettes.map(({prefix}) => prefix), roles, alerts, alertInk);
   exportCss = `:root {\n  --my-brand-color: ${lastHex};\n}\n\n@theme static {\n` +
     [...tokens].map(([name, [L, C, H]]) =>
       `  --${name}: oklch(${L}% ${fmt(C)} ${fmt(H, 4)});`
