@@ -46,7 +46,7 @@ button, summary { cursor: pointer; }
 #error:empty { display: none; }
 #gray-hue-label, #error { font-size: 13px; }
 #gray-hue { width: 6ch; }
-#rgb-toggle, .theme-toggle, .downloads summary {
+#hsl-toggle, .theme-toggle, .downloads summary {
   display: grid;
   place-items: center;
   width: 44px;
@@ -65,30 +65,30 @@ button, summary { cursor: pointer; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-#rgb-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
-.rgb-panel, .download-options, .color-hint {
+#hsl-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.hsl-panel, .download-options, .color-hint {
   background: var(--panel);
   box-shadow: 0 10px 32px #0003;
   border: 1px solid var(--line);
   border-radius: 14px;
 }
-.rgb-panel, .download-options {
+.hsl-panel, .download-options {
   position: absolute;
   z-index: 20;
   top: calc(100% + 8px);
 }
-.rgb-panel { left: 0; width: min(280px, calc(100vw - 40px)); padding: 16px; }
-#sv-plane {
+.hsl-panel { left: 0; width: min(280px, calc(100vw - 40px)); padding: 16px; }
+#sl-plane {
   position: relative;
   width: 100%;
   height: 180px;
   border-radius: 8px;
-  background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+  background-image: linear-gradient(to bottom, #fff, transparent 50%, #000), linear-gradient(to right, #808080, transparent);
   touch-action: none;
   cursor: crosshair;
   overflow: hidden;
 }
-#sv-marker {
+#sl-marker {
   position: absolute;
   width: 12px;
   height: 12px;
@@ -118,9 +118,9 @@ button, summary { cursor: pointer; }
   box-shadow: 0 0 0 1px #0005;
 }
 #picker-hue::-moz-range-thumb { border: 2px solid #fff; border-radius: 50%; background: transparent; }
-.rgb-fields { display: flex; gap: 10px; font-size: 12px; }
-.rgb-fields label { flex: 1; min-width: 0; }
-.rgb-fields input {
+.hsl-fields { display: flex; gap: 10px; font-size: 12px; }
+.hsl-fields label { flex: 1; min-width: 0; }
+.hsl-fields input {
   display: block;
   width: 100%;
   margin-top: 5px;
@@ -163,7 +163,7 @@ h2 { font-size: 17px; margin: 0; }
 .matrix-swatch {
   width: 100%;
   min-height: 44px;
-  padding: 4px;
+  padding: 8px;
   border: 1px solid var(--preview);
   border-radius: 10px;
   font-size: 11px;
@@ -204,11 +204,15 @@ h2 { font-size: 17px; margin: 0; }
 <header class="page-controls">
   <div class="controls-inner">
     <div class="inputs">
-      <div class="hex-control"><div class="hex-input"><span id="input-swatch"></span><input id="hex" aria-label="Base HEX" value="#EF3340" maxlength="7" spellcheck="false" aria-describedby="error"><button id="rgb-toggle" type="button" aria-expanded="false" aria-controls="rgb-panel" aria-label="RGB color picker"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 7 9 10 9-10"/></svg></button></div>
-        <div id="rgb-panel" class="rgb-panel" role="dialog" aria-label="RGB color picker" hidden>
-          <div id="sv-plane" tabindex="0" role="slider" aria-label="Saturation and value" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span id="sv-marker"></span></div>
-          <label class="picker-hue-label" for="picker-hue">Hue</label><input id="picker-hue" type="range" min="0" max="359.9" step="0.1" value="0" aria-label="RGB hue">
-          <div class="rgb-fields"><label>R<input id="rgb-r" type="number" min="0" max="255" step="1"></label><label>G<input id="rgb-g" type="number" min="0" max="255" step="1"></label><label>B<input id="rgb-b" type="number" min="0" max="255" step="1"></label></div>
+      <div class="hex-control"><div class="hex-input"><span id="input-swatch"></span><input id="hex" aria-label="Base HEX" value="#EF3340" maxlength="7" spellcheck="false" aria-describedby="error"><button id="hsl-toggle" type="button" aria-expanded="false" aria-controls="hsl-panel" aria-label="HSL color picker"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 7 9 10 9-10"/></svg></button></div>
+        <div id="hsl-panel" class="hsl-panel" role="dialog" aria-label="HSL color picker" hidden>
+          <div id="sl-plane" tabindex="0" role="slider" aria-label="Saturation and lightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span id="sl-marker"></span></div>
+          <label class="picker-hue-label" for="picker-hue">Hue</label><input id="picker-hue" type="range" min="0" max="359.9" step="0.1" value="0" aria-label="HSL hue">
+          <div class="hsl-fields">
+            <label>H (°)<input id="hsl-h" type="number" min="0" max="359.9" step="0.1"></label>
+            <label>S (%)<input id="hsl-s" type="number" min="0" max="100" step="0.1"></label>
+            <label>L (%)<input id="hsl-l" type="number" min="0" max="100" step="0.1"></label>
+          </div>
         </div>
       </div>
       <fieldset class="neutral-control" aria-label="Neutral hue"><div id="neutral-options" class="neutral-options"></div></fieldset>
@@ -219,7 +223,7 @@ h2 { font-size: 17px; margin: 0; }
       </details>
     </div>
     <p id="error" role="status"></p>
-    <label id="gray-hue-label" hidden>Reference RGB hue <input id="gray-hue" type="number" min="0" max="359" value="0"></label>
+    <label id="gray-hue-label" hidden>Reference HSL hue <input id="gray-hue" type="number" min="0" max="359" value="0"></label>
 
   </div>
 </header>
@@ -320,7 +324,7 @@ const blocksForTheme = {light: 'color-white', dark: 'color-gray-900'};
 const $=s=>document.querySelector(s);
 const fmt=(n,p=6)=>Number(n.toFixed(p)).toString();
 const ok=(L,C,H)=>`oklch(${fmt(L)} ${fmt(C)} ${fmt(H,4)})`;
-let selectedNeutral=4,lastHex='#EF3340',rowId=0,pickerHSV={h:0,s:1,v:1};
+let selectedNeutral=4,lastHex='#EF3340',rowId=0,pickerHSL={h:0,s:1,l:.5};
 const recipeHex=v=>colorValues(v.L,v.C,v.H).hex;
 const ratioText=(a,b)=>{const r=contrastRatio(a,b);return `${r.toFixed(2)}:1 · ${r>=7?'AAA':r>=4.5?'AA':'Below AA'}`;};
 function closeHints() {
@@ -382,14 +386,15 @@ function renderMatrix(tokens, original, families, roles, alerts, alertInk) {
     cell.textContent = [...new Set(names.map(name => roles.get(name)).filter(Boolean))].join(', ');
   }
 
-  const rows = graySteps.map(([step]) => {
+  const rows = graySteps.flatMap(([step]) => {
+    if (![['color-gray', 'color-neutral'], families].flat().some(family => roles.has(`${family}-${step}`))) return [];
     const row = document.createElement('tr');
     for (const group of [['color-gray', 'color-neutral'], families]) {
       const names = group.map(family => `${family}-${step}`);
       for (const name of names) {
         const cell = row.insertCell();
         const value = tokens.get(name);
-        if (value) cell.append(matrixSample(name, value, background, alerts.get(name), alertInk.get(name)));
+        if (value && roles.has(name)) cell.append(matrixSample(name, value, background, alerts.get(name), alertInk.get(name)));
       }
       appendFunction(row, names);
     }
@@ -515,23 +520,65 @@ function render(restoreFocus){
   if(typeof restoreFocus==='number')document.querySelector(`[name="neutral-hue"][value="${restoreFocus}"]`).focus();
 }
 function hexRgb(hex){return hex.slice(1).match(/../g).map(v=>parseInt(v,16));}
-function syncPicker(){const rgb=hexRgb(lastHex).map(v=>v/255),max=Math.max(...rgb),min=Math.min(...rgb);pickerHSV={h:rgbHue(rgb)??pickerHSV.h,s:max===0?0:(max-min)/max,v:max};paintPicker();}
-function paintPicker(){const {h,s,v}=pickerHSV;$('#sv-plane').style.backgroundColor=`hsl(${h} 100% 50%)`;$('#sv-marker').style.left=(s*100)+'%';$('#sv-marker').style.top=((1-v)*100)+'%';$('#sv-plane').setAttribute('aria-valuenow',Math.round(s*100));$('#sv-plane').setAttribute('aria-valuetext',`S ${Math.round(s*100)}%, V ${Math.round(v*100)}%`);$('#picker-hue').value=h;hexRgb(lastHex).forEach((v,i)=>{const input=$(['#rgb-r','#rgb-g','#rgb-b'][i]);if(document.activeElement!==input)input.value=v;});}
-function applyPicker(){const {h,s,v}=pickerHSV;const k=n=>(n+h/60)%6;const rgb=[5,3,1].map(n=>Math.round(255*(v-v*s*Math.max(0,Math.min(k(n),4-k(n),1)))));lastHex='#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();$('#hex').value=lastHex;render();paintPicker();}
-function planePoint(e){const rect=$('#sv-plane').getBoundingClientRect();pickerHSV.s=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));pickerHSV.v=1-Math.max(0,Math.min(1,(e.clientY-rect.top)/rect.height));applyPicker();}
+const hslFields = [['h', 1, 359.9], ['s', 100, 100], ['l', 100, 100]];
+
+function syncPicker() {
+  const rgb = hexRgb(lastHex).map(channel => channel / 255);
+  const max = Math.max(...rgb);
+  const min = Math.min(...rgb);
+  const l = (max + min) / 2;
+  const s = max === min ? 0 : (max - min) / (1 - Math.abs(2 * l - 1));
+  pickerHSL = {h: rgbHue(rgb) ?? pickerHSL.h, s, l};
+  paintPicker();
+}
+
+function paintPicker() {
+  const {h, s, l} = pickerHSL;
+  const plane = $('#sl-plane');
+  plane.style.backgroundColor = `hsl(${h} 100% 50%)`;
+  $('#sl-marker').style.left = `${s * 100}%`;
+  $('#sl-marker').style.top = `${(1 - l) * 100}%`;
+  plane.setAttribute('aria-valuenow', Math.round(s * 100));
+  plane.setAttribute('aria-valuetext', `S ${Math.round(s * 100)}%, L ${Math.round(l * 100)}%`);
+  $('#picker-hue').value = h;
+  for (const [channel, scale, max] of hslFields) {
+    const input = $(`#hsl-${channel}`);
+    if (document.activeElement !== input) input.value = Math.min(max, fmt(pickerHSL[channel] * scale, 1));
+  }
+}
+
+function applyPicker() {
+  const {h, s, l} = pickerHSL;
+  const amplitude = s * Math.min(l, 1 - l);
+  const rgb = [0, 8, 4].map(offset => {
+    const k = (offset + h / 30) % 12;
+    return Math.round(255 * (l - amplitude * Math.max(-1, Math.min(k - 3, 9 - k, 1))));
+  });
+  $('#hex').value = '#' + rgb.map(channel => channel.toString(16).padStart(2, '0')).join('').toUpperCase();
+  render();
+  paintPicker();
+}
+function planePoint(e){const rect=$('#sl-plane').getBoundingClientRect();pickerHSL.s=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));pickerHSL.l=1-Math.max(0,Math.min(1,(e.clientY-rect.top)/rect.height));applyPicker();}
 $('#hex').addEventListener('input',()=>{render();if(!$('#hex').hasAttribute('aria-invalid'))syncPicker();});
 $('#hex').addEventListener('blur',()=>{if(!$('#hex').hasAttribute('aria-invalid'))$('#hex').value=lastHex;});
 $('#gray-hue').oninput=render;
-$('#rgb-toggle').onclick=()=>{const open=$('#rgb-panel').hidden;$('#rgb-panel').hidden=!open;$('#rgb-toggle').setAttribute('aria-expanded',String(open));if(open){closeHints();syncPicker();}};
-$('#sv-plane').onpointerdown=e=>{if(!e.isPrimary||e.button>0)return;$('#sv-plane').setPointerCapture(e.pointerId);planePoint(e);};
-$('#sv-plane').onpointermove=e=>{if($('#sv-plane').hasPointerCapture(e.pointerId))planePoint(e);};
-$('#sv-plane').onpointerup=e=>{if($('#sv-plane').hasPointerCapture(e.pointerId))$('#sv-plane').releasePointerCapture(e.pointerId);};
-$('#sv-plane').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const step=e.shiftKey?.1:.01;if(e.key==='ArrowLeft')pickerHSV.s=Math.max(0,pickerHSV.s-step);if(e.key==='ArrowRight')pickerHSV.s=Math.min(1,pickerHSV.s+step);if(e.key==='ArrowUp')pickerHSV.v=Math.min(1,pickerHSV.v+step);if(e.key==='ArrowDown')pickerHSV.v=Math.max(0,pickerHSV.v-step);applyPicker();};
-$('#picker-hue').oninput=e=>{pickerHSV.h=Number(e.target.value);applyPicker();};
-['#rgb-r','#rgb-g','#rgb-b'].forEach(id=>$(id).oninput=()=>{const nums=['#rgb-r','#rgb-g','#rgb-b'].map(s=>Math.round(Math.max(0,Math.min(255,Number($(s).value)))));$('#hex').value='#'+nums.map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();render();syncPicker();});
-document.addEventListener('pointerdown',e=>{if(!e.target.closest('.downloads'))$('.downloads').open=false;if(!e.target.closest('.hint-anchor'))closeHints();if(!e.target.closest('.hex-control')){$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('.downloads').open){$('.downloads').open=false;$('.downloads summary').focus();return;}document.querySelectorAll('.hint-anchor').forEach(a=>a.classList.add('suppressed'));closeHints();$('#rgb-panel').hidden=true;$('#rgb-toggle').setAttribute('aria-expanded','false');document.activeElement?.blur();}});
-['#rgb-r','#rgb-g','#rgb-b'].forEach((id,i)=>$(id).onblur=()=>{$(id).value=hexRgb(lastHex)[i];});
+$('#hsl-toggle').onclick=()=>{const open=$('#hsl-panel').hidden;$('#hsl-panel').hidden=!open;$('#hsl-toggle').setAttribute('aria-expanded',String(open));if(open){closeHints();syncPicker();}};
+$('#sl-plane').onpointerdown=e=>{if(!e.isPrimary||e.button>0)return;$('#sl-plane').setPointerCapture(e.pointerId);planePoint(e);};
+$('#sl-plane').onpointermove=e=>{if($('#sl-plane').hasPointerCapture(e.pointerId))planePoint(e);};
+$('#sl-plane').onpointerup=e=>{if($('#sl-plane').hasPointerCapture(e.pointerId))$('#sl-plane').releasePointerCapture(e.pointerId);};
+$('#sl-plane').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const step=e.shiftKey?.1:.01;if(e.key==='ArrowLeft')pickerHSL.s=Math.max(0,pickerHSL.s-step);if(e.key==='ArrowRight')pickerHSL.s=Math.min(1,pickerHSL.s+step);if(e.key==='ArrowUp')pickerHSL.l=Math.min(1,pickerHSL.l+step);if(e.key==='ArrowDown')pickerHSL.l=Math.max(0,pickerHSL.l-step);applyPicker();};
+$('#picker-hue').oninput=e=>{pickerHSL.h=Number(e.target.value);applyPicker();};
+for (const [channel, scale, max] of hslFields) {
+  const input = $(`#hsl-${channel}`);
+  input.oninput = () => {
+    if (Number.isNaN(input.valueAsNumber)) return;
+    pickerHSL[channel] = Math.min(max, Math.max(0, input.valueAsNumber)) / scale;
+    applyPicker();
+  };
+  input.onblur = () => { input.value = Math.min(max, fmt(pickerHSL[channel] * scale, 1)); };
+}
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.downloads'))$('.downloads').open=false;if(!e.target.closest('.hint-anchor'))closeHints();if(!e.target.closest('.hex-control')){$('#hsl-panel').hidden=true;$('#hsl-toggle').setAttribute('aria-expanded','false');}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('.downloads').open){$('.downloads').open=false;$('.downloads summary').focus();return;}document.querySelectorAll('.hint-anchor').forEach(a=>a.classList.add('suppressed'));closeHints();$('#hsl-panel').hidden=true;$('#hsl-toggle').setAttribute('aria-expanded','false');document.activeElement?.blur();}});
 const initialHex = locationParams.get('hex');
 if (/^#[a-f0-9]{6}$/i.test(initialHex ?? '')) $('#hex').value = initialHex;
 const initialNeutral = Number(locationParams.get('neutral') ?? 4);
